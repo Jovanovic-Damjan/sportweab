@@ -1,0 +1,174 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    margin: auto;
+}
+
+nav {
+    width: 35%;
+    height: auto;
+    margin: auto;
+    text-align: center;
+}
+
+header{
+    /*border: 1px red solid;*/
+    width: 600px;
+    height: 150px;
+    margin: auto;
+}
+
+article {
+    margin: auto;
+    padding-top: 50px;
+    /*border: 1px solid darkgray;*/
+    height: 300px;
+}
+
+section {
+    /*border: 1px solid black;*/
+    height: 450px;
+    width: 60%;
+    margin: auto;
+}
+
+li {
+    padding-top: 30px;
+    display: inline-block;
+    padding: 20px;
+    margin: auto;
+    padding: 10px;
+}
+
+a {
+    color: #4286f4;
+}
+h1{
+    margin-bottom: 20px;
+}
+table {
+    margin: auto;
+    margin-top: 50px;
+}
+td, th{
+    text-align: center;
+    margin: auto;
+}
+img {
+    width: 100%;
+}
+
+h1, h2{
+    text-align: center;
+}
+
+
+legend{
+    text-align: center;
+}
+/******************************************/
+/**************** Classes *****************/
+/******************************************/
+.tableTD {
+    height: 280px;
+    width: 280px;
+    border: 1px solid blue;
+    padding: 20px;
+    border-radius: 10px;
+}
+.panier{
+    border-bottom-style: solid;
+    margin-top: 30px;
+    line-height: 100px;
+}
+
+.users{
+    width: 200px;
+    height: auto;
+}
+
+.img-article{
+    opacity: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: .5s ease;
+    backface-visibility: hidden;
+    margin-bottom: 10px;
+}
+.middle {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+}
+.container:hover .img-article {
+    opacity: 0.3;
+}
+.img-article:hover{
+    background: rgba(63, 127, 191, 0.3);
+}
+.text-article{
+    font-size: 24px;
+    color: #0f0f0f;
+}
+.container:hover .middle {
+    opacity: 1;
+
+}
+.img-panier{
+    width: 60%;
+}
+
+.administration{
+    width: 30%;
+    margin: auto;
+}
+
+.produit-article{
+    color: white;
+    font-size: 15pt;
+    text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+.produit-article:hover{
+    text-decoration: none;
+    color: dodgerblue;
+}
+.texteArticle{
+    font-size: 15pt;
+    text-align: justify;
+}
+.articleRow{
+    text-align: center;
+}
+/******************************************/
+/**************** ID *****************/
+/******************************************/
+
+#tableAdmin{
+    margin-top: 50px;
+}
+#register{
+    margin: auto;
+    width: 40%;
+    text-align: center;
+}
+#login{
+    width: 20%;
+}
+#inputPassword{
+    margin-bottom: 20px;
+}
+
+#imageArticle{
+    height: auto;
+    width: 70% ;
+    border-radius: 3px;
+    box-shadow: 1px 1px 12px #555;
+}
+#texteArticle{
+    text-align: justify;
+}
