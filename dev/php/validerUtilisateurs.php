@@ -1,15 +1,18 @@
 <?php
+session_start();
+
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-if (isset($_SESSION["typeUtilisateur"]) != "Administrateur") {
-    header('location: index.php');
+
+if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
+{
+    header("Location: index.php");
+    exit();
 }
+$usersToValidate = getNonValidateUser();
 
 ?>
 <!doctype html>
-<?php
-$usersToValidate = getNonValidateUser();
-?>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
@@ -45,7 +48,6 @@ $usersToValidate = getNonValidateUser();
                 <td colspan="4"><a href="administration.php">Retour à l'administration</a></td>
             </tr>
         </table>
-
     </section>
 </article>
 </body>

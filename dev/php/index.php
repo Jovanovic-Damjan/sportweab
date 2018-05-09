@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 ?>
@@ -15,6 +16,7 @@ $bootstrapColWidth = 12 / $numOfCols;
     <title>Index</title>
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
@@ -29,8 +31,10 @@ $bootstrapColWidth = 12 / $numOfCols;
     <img src="../img/logo.jpg">
 </header>
 <article>
-    <h1>Nouveautés</h1>
     <section>
+        <div class="row">
+            <h1>Nouveautés</h1>
+        </div>
         <div class="row">
             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
                 <div class="carousel-inner">
@@ -54,10 +58,8 @@ $bootstrapColWidth = 12 / $numOfCols;
                 </a>
             </div>
             <?php
-
-            /* Boucle permettant d'afficher tout les articles*/
+            /* Boucle permettant d'afficher tout les articles
             foreach ($articles as $key => $value) { ?>
-
                 <div class="col-md-4 container"><img class="img-article" src="../img/<?= $value['imageArticle'];?>">
                     <div class="middle">
                         <label><a href="article.php?id=<?= $value['idArticle']; ?>" class="produit-article"><?= $value['nomArticle']; ?></a></label>
@@ -67,7 +69,30 @@ $bootstrapColWidth = 12 / $numOfCols;
                 $rowCount++;
                 if ($rowCount % $numOfCols == 0) echo '</div><div class="row">';
             }
-            ?>
+            */ ?>
+        </div>
+        <div class="row">
+            <h1>Les catégories</h1>
+        </div>
+        <div class="row">
+                <div class="col-xs-12 col-md-4 container">
+                    <img class="img-article" src="../img/t-shirt.jpg">
+                    <div class="middle">
+                        <label><a href="produits.php?categorie=tshirt" class="produit-article">T-shirt</a></label>
+                    </div>
+                </div>
+                <div class="col-md-4 container">
+                    <img class="img-article" src="../img/hoodie.jpg">
+                    <div class="middle">
+                        <label><a href="produits.php?categorie=hoodie" class="produit-article">Hoodie</a></label>
+                    </div>
+                </div>
+                <div class="col-md-4 container">
+                    <img class="img-article" src="../img/casquette.jpg">
+                    <div class="middle">
+                        <label><a href="produits.php?categorie=casquette" class="produit-article">Casquette</a></label>
+                    </div>
+                </div>
         </div>
     </section>
 </article>

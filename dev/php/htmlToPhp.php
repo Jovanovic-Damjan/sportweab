@@ -23,13 +23,13 @@ function menu()
             </li>";
     if ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Administrateur")) {
         echo "<li class='nav-item'><a class='nav-link' href='administration.php'>Administration</a></li>";
-        echo "<li class='nav-item'><a class='nav-link' href='logout.php'>Logout</a></li>";
+        echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Utilisateur")) {
         echo "<li class='nav-item'>" . $_SESSION["login"] . "</li>";
         echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier</a></li>";
-        echo "<li class='nav-item'><a class='nav-link' href='logout.php'>Logout</a></li>";
+        echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif (!isset($_SESSION["login"])) {
-        echo "<li class='nav-item'><a class='nav-link' href='login.php'>Login</a></li>";
+        echo "<li class='nav-item'><a class='nav-link' href='connexion.php'>Login</a></li>";
     }
     echo "</ul>
     </div>

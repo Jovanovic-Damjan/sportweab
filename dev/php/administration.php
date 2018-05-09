@@ -1,9 +1,13 @@
 <?php
+session_start();
+
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-if(isset($_SESSION['typeUtilisateur']) != "Administrateur")
+
+if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
 {
-    header('location: index.php');
+    header("Location: index.php");
+    exit();
 }
 ?>
 <!doctype html>
@@ -31,15 +35,6 @@ if(isset($_SESSION['typeUtilisateur']) != "Administrateur")
             <a href="ajouterProduits.php" class="btn btn-info">Ajouter des produits</a>
             <a href="validerUtilisateurs.php" class="btn btn-info">Valider des utilisateurs</a>
         </div>
-
-       <!-- <table id="tableAdmin">
-            <tr>
-                <td><a href="ajouterProduits.php" class="btn btn-info">Ajouter des produits</a></td>
-            </tr>
-            <tr>
-                <td><a href="validerUtilisateurs.php" class="btn btn-info">Valider des utilisateurs</a></td>
-            </tr>
-        </table>-->
     </section>
 </article>
 </body>

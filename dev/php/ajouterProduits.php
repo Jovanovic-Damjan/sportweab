@@ -1,9 +1,11 @@
 <?php
+session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-if(isset($_SESSION["typeUtilisateur"]) != "Administrateur")
+if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
 {
-    header('location: index.php');
+    header("Location: index.php");
+    exit();
 }
 ?>
 <!doctype html>
@@ -23,21 +25,35 @@ if(isset($_SESSION["typeUtilisateur"]) != "Administrateur")
     <h1>Administration</h1>
     <h2>Ajouter des produits</h2>
 </header>
-<article>
+<article id="containerAjoutProduit">
     <section>
-        <table>
-            <tr>
-                <td><label>Nom du produit :</label></td>
-                <td><input type="text" name="nomProduit" class="form-control" placeholder="Numéro de téléphone"></td>
-            </tr>
-            <tr>
-                <td><label>Description du produit :</label></td>
-                <td><textarea name="nomProduit" class="form-control" placeholder="Description du produit"></textarea></td>
-            </tr>
-            <tr>
-
-            </tr>
-        </table>
+        <form>
+            <div class="form-group">
+                <label for="nomArticle">Nom de l'article</label>
+                <input type="text" class="form-control" id="nomArticle" aria-describedby="nomArticle" placeholder="Le nom de l'article">
+                <small id="nomArticle" class="form-text text-muted">Exemple : "T-shirt Blanc"</small>
+            </div>
+            <div class="form-group">
+                <label for="exampleInputFile">Image de l'article</label>
+                <input type="file" class="form-control-file" id="exampleInputFile" aria-describedby="fileHelp">
+                <small id="fileHelp" class="form-text text-muted">Nom de l'image</small>
+            </div>
+            <div class="form-group">
+                <label for="exampleTextarea">Description de l'article</label>
+                <textarea class="form-control" id="exampleTextarea" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="descriptionArticle">Prix de l'article de l'article</label>
+                <input type="text" class="form-control" id="descriptionArticle" aria-describedby="descriptionArticle" placeholder="Description de l'article">
+                <small id="descriptionArticle" class="form-text text-muted">Exemple : "T-shirt Blanc"</small>
+            </div>
+            <div class="form-group">
+                <label for="example-number-input">Number</label>
+                <div class="col-10">
+                    <input class="form-control" type="number" value="42" id="example-number-input">
+                </div>
+            </div>
+        </form>
     </section>
 </article>
 </body>

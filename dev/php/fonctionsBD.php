@@ -1,5 +1,4 @@
 <?php
-session_start();
 define('DB_HOST', "127.0.0.1"); //adresse ip de la base.
 define('DB_NAME', "sportweab"); //nom de la base de donnée.
 define('DB_USER', "sportweab"); //utilisateur.
@@ -19,6 +18,7 @@ function getConnexion() {
     }
     return $dbb;
 }
+
 /* Fonction permettant d'afficher les rôles des utilisateurs */
 function getRoles(){
     try {
@@ -44,6 +44,7 @@ function getArticles(){
     }
 }
 
+/* Fonction permettant d'afficher les informations de l'article en fonction de l'id de l'article*/
 function getArticleInfo($id){
         $connexion = getConnexion();
         $request = $connexion->prepare("SELECT DISTINCT idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie,prix FROM articles, categories, prix WHERE articles.idPrix = prix.idPrix AND articles.idCategorie = categories.idCategorie and idArticle = :id;");
@@ -63,6 +64,7 @@ function login($login,$pwd)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/* Fonction permettant de créer un client */
 function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $mail, $motPasse)
 {
     $connexion = getConnexion();
@@ -79,6 +81,7 @@ function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $m
     return $connexion->lastInsertId();
 }
 
+/* Fonction permettant de vérifier s'il y a déjà un utilisateur enregsitré dans la base de données avec le même e-mail*/
 function user_exists($mail){
     try {
         $connexion = getConnexion();
@@ -93,13 +96,13 @@ function user_exists($mail){
 }
 
 
-/* Fonction permettant de s'enregistrer  */
-function registerUser($mail, $password)
+/* Fonction permettant de créer un utilisateur  */
+function registerUser($mail, $password1)
 {
     $connexion = getConnexion();
     $request = $connexion->prepare("INSERT INTO `utilisateurs` (`mailUtilisateur`, `motPasse`) VALUES (:mail, :motPasse)");
     $request->bindParam(':mail', $mail, PDO::PARAM_STR);
-    $request->bindParam(':motPasse', $password, PDO::PARAM_STR);
+    $request->bindParam(':motPasse', $password1, PDO::PARAM_STR);
     $request->execute();
     return $connexion->lastInsertId();
 }
@@ -108,20 +111,30 @@ function registerUser($mail, $password)
 function registerClient($nom, $prenom, $adresse, $codePostal, $ville, $pays, $telephone, $mail, $motPasse, $idUser)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `clients` (`nom`, `prenom`, `adresse`, `codePostal`, `ville`, `pays`,`telephone`, `mail`, `motPasse`, `idUtilisateur`) VALUES (:nom, :prenom, :adresse, :codePostal, :ville, :pays, :telephone, :mail, :motPasse, :idUtilsateur)");
+    $request = $connexion->prepare("INSERT INTO `clients` (`nomClient`, `prenomClient`, `adresseClient`, `codePostal`, `ville`, `pays`, `telephone`, `mail`, `motPasse`, `idUtilisateur`) VALUES (:nom, :prenom, :adresse, :codePostal, :ville, :pays, :telephone, :mail, :motPasse, :idUtilisateur)");
     $request->bindParam(':nom', $nom, PDO::PARAM_STR);
     $request->bindParam(':prenom', $prenom, PDO::PARAM_STR);
     $request->bindParam(':adresse', $adresse, PDO::PARAM_STR);
     $request->bindParam(':codePostal', $codePostal, PDO::PARAM_INT);
     $request->bindParam(':ville', $ville, PDO::PARAM_STR);
     $request->bindParam(':pays', $pays, PDO::PARAM_STR);
-    $request->bindParam(':telephone', $telephone, PDO::PARAM_INT);
+    $request->bindParam(':telephone', $telephone, PDO::PARAM_STR);
     $request->bindParam(':mail', $mail, PDO::PARAM_STR);
     $request->bindParam(':motPasse', $motPasse, PDO::PARAM_STR);
     $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
     $request->execute();
 }
 
+/* Fonction permettant de s'enregistrer  */
+function createWallet($idUser)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `portemonnaie` (`idUtilisateur`) VALUES (:idUtilisateur)");
+    $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
+    $request->execute();
+}
+
+/* Fonction permettant de recevoir les informations de l'utilisateur */
 function getUserInformation($email)
 {
     $connexion = getConnexion();
@@ -131,6 +144,7 @@ function getUserInformation($email)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/* Fonction permettant de voir le rôle de l'utilisateur */
 function getUserRole($email)
 {
     $connexion = getConnexion();
@@ -140,6 +154,7 @@ function getUserRole($email)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/* Fonction permettant de voir les utilisateurs non-validé */
 function getNonValidateUser(){
     try {
         $connexion = getConnexion();
@@ -152,6 +167,7 @@ function getNonValidateUser(){
     }
 }
 
+/* Fonction permettant de voir les utilisateurs validé */
 function getValidateUser(){
     try {
         $connexion = getConnexion();
@@ -164,6 +180,7 @@ function getValidateUser(){
     }
 }
 
+/* Fonction permetant de valider un utilisateur */
 function validateUser($idUser) {
     try {
         $connexion = getConnexion();
@@ -174,7 +191,6 @@ function validateUser($idUser) {
         throw $e;
     }
 }
-
 
 
 ?>

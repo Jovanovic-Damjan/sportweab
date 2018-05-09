@@ -10,7 +10,7 @@ nav {
     text-align: center;
 }
 
-header{
+header {
     /*border: 1px red solid;*/
     width: 600px;
     height: 150px;
@@ -42,29 +42,45 @@ li {
 a {
     color: #4286f4;
 }
-h1{
+
+h1 {
     margin-bottom: 20px;
 }
+
 table {
     margin: auto;
-    margin-top: 50px;
+    margin-top: 100px;
 }
-td, th{
+
+td, th {
     text-align: center;
     margin: auto;
 }
+
 img {
     width: 100%;
 }
 
-h1, h2{
+h1, h2 {
+    text-align: center;
+    border-bottom-style: solid;
+    margin: auto;
+    margin-bottom: 10px;
+    width: 60%;
+}
+
+p {
+    text-align: justify;
+}
+
+legend {
     text-align: center;
 }
 
-
-legend{
-    text-align: center;
+textarea {
+    resize: none;
 }
+
 /******************************************/
 /**************** Classes *****************/
 /******************************************/
@@ -75,18 +91,19 @@ legend{
     padding: 20px;
     border-radius: 10px;
 }
-.panier{
+
+.panier {
     border-bottom-style: solid;
     margin-top: 30px;
     line-height: 100px;
 }
 
-.users{
+.users {
     width: 200px;
     height: auto;
 }
 
-.img-article{
+.img-article {
     opacity: 1;
     display: block;
     width: 100%;
@@ -95,6 +112,7 @@ legend{
     backface-visibility: hidden;
     margin-bottom: 10px;
 }
+
 .middle {
     transition: .5s ease;
     opacity: 0;
@@ -105,70 +123,93 @@ legend{
     -ms-transform: translate(-50%, -50%);
     text-align: center;
 }
+
 .container:hover .img-article {
     opacity: 0.3;
 }
-.img-article:hover{
+
+.img-article:hover {
     background: rgba(63, 127, 191, 0.3);
 }
-.text-article{
+
+.text-article {
     font-size: 24px;
     color: #0f0f0f;
 }
+
 .container:hover .middle {
     opacity: 1;
 
 }
-.img-panier{
+
+.img-panier {
     width: 60%;
 }
 
-.administration{
+.administration {
     width: 30%;
     margin: auto;
 }
 
-.produit-article{
+.produit-article {
     color: white;
     font-size: 15pt;
     text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
 }
-.produit-article:hover{
+
+.produit-article:hover {
     text-decoration: none;
     color: dodgerblue;
 }
-.texteArticle{
+
+.texteArticle {
     font-size: 15pt;
     text-align: justify;
 }
-.articleRow{
+
+.imageArticle {
+    height: 90%;
+}
+
+.displayArticle {
+    margin: auto;
     text-align: center;
+}
+.displayFont{
+    line-height: 2;
 }
 /******************************************/
 /**************** ID *****************/
 /******************************************/
 
-#tableAdmin{
+#tableAdmin {
     margin-top: 50px;
 }
-#register{
+
+#register {
     margin: auto;
     width: 40%;
     text-align: center;
 }
-#login{
+
+#login {
     width: 20%;
 }
-#inputPassword{
+
+#inputPassword {
     margin-bottom: 20px;
 }
 
-#imageArticle{
+#imageArticle {
     height: auto;
-    width: 70% ;
+    width: 70%;
     border-radius: 3px;
     box-shadow: 1px 1px 12px #555;
 }
-#texteArticle{
-    text-align: justify;
+
+#containerAjoutProduit {
+    margin-top: 100px;
+    text-align: center;
+    width: 50%;
 }
+
