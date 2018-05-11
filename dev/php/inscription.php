@@ -76,7 +76,7 @@ exit();
     <link href="../css/style.css" rel="stylesheet">
     <script src='https://www.google.com/recaptcha/api.js'></script>
 </head>
-<body>
+<body onselectstart="return false">
 <?= menu(); ?>
 <header>
     <img src="../img/logo.jpg">
@@ -111,7 +111,7 @@ exit();
             <input type="text" name="adresse" required class="form-control" placeholder="Adresse" value="<?php if (isset($adresse)) {echo $adresse;} ?>">
             <input type="text" name="ville" required class="form-control" placeholder="Ville" value="<?php if (isset($ville)) {echo $ville;} ?>">
             <select name="pays" class="form-control" value="<?php if (isset($pays)) {echo $pays;} ?>">
-                <option value="">Country...</option>
+                <option value="">Pays...</option>
                 <option value="Afganistan">Afghanistan</option>
                 <option value="Albania">Albania</option>
                 <option value="Algeria">Algeria</option>
@@ -362,7 +362,7 @@ exit();
             </select>
             <input type="text" name="codePostal" required class="form-control" placeholder="Code postal" value="<?php if (isset($codePostal)) {echo $codePostal;} ?>">
             <input type="text" name="telephone" required class="form-control" placeholder="Numéro de téléphone" value="<?php if (isset($telephone)) {echo $telephone;} ?>">
-            <label for="captcha">Recopiez le mot : "<?php echo captcha(); ?>"</label>
+            <label for="captcha" onselectstart="return false">Recopiez le mot : "<?php echo captcha(); ?>"</label>
             <input type="text" name="captcha" placeholder="captcha" required class="form-control" id="captcha"/><br/>
             <input type="submit" name="register" class="btn btn-lg btn-primary btn-block">
             <a href="connexion.php">Retour au login</a>

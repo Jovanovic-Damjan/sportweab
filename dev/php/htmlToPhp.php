@@ -36,4 +36,25 @@ function menu()
 </nav>";
 }
 
+function getSelectCategories(){
+    $categories = getCategories();
+    if(isset($_GET['id'])){
+        $actualCategorie = getArticleInfo($_GET['id'])[0]['idCategorie'];
+        foreach ($categories as $key => $value) {
+            if ($value['idCategorie'] == $actualCategorie){
+                echo '<option selected value='.$value['idCategorie'].'>'. $value['nomCategorie'] . '</option>';
+            }
+            else {
+                echo '<option value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
+            }
+        }
+    }
+    else{
+        foreach ($categories as $key => $value) {
+                echo '<option value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
+        }
+    }
+}
+
+
 ?>

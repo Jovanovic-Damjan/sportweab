@@ -3,13 +3,20 @@ session_start();
 
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
+$success = "";
+
+if (isset($_POST['valider'])) {
+    $idUser = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
+    $validate = validateUser($idUser);
+    $success = "Utilisateur validé avec succès !";
+}
 
 if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
 {
-    header("Location: index.php");
+    header("location: index.php");
     exit();
 }
-$usersToValidate = getNonValidateUser();
+$usersToValidate = getNotValidateUsers();
 
 ?>
 <!doctype html>
@@ -48,14 +55,13 @@ $usersToValidate = getNonValidateUser();
                 <td colspan="4"><a href="administration.php">Retour à l'administration</a></td>
             </tr>
         </table>
+        <?php
+        if ($success != "") {
+            echo '<div class="alert alert-success message" role="alert">';
+            echo $success;
+            echo '</div>';
+        }?>
     </section>
 </article>
 </body>
 </html>
-<?php
-if (isset($_POST['valider'])) {
-    $idUser = filter_input(INPUT_POST, 'id', FILTER_SANITIZE_NUMBER_INT);
-    $validate = validateUser($idUser);
-    header('location : validerUtilisateurs.php');
-}
-?>

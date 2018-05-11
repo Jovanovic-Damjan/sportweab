@@ -37,16 +37,15 @@ $bootstrapColWidth = 12 / $numOfCols;
         </div>
         <div class="row">
             <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-                <div class="carousel-inner">
+                <div class="carousel-inner" role="listbox">
                     <div class="carousel-item active">
-                        <img class="d-block w-100" src="../img/kaki.png" alt="First slide">
+                        <img class="d-block img-fluid" src="../img/kaki.png" alt="First slide">
                     </div>
-                    <div class="carousel-item">
-                        <img class="d-block w-100" src="../img/black.png" alt="Second slide">
-                    </div>
-                    <div class="carousel-item">
-                        <img class="d-block w-100" src="../img/beige.png" alt="Third slide">
-                    </div>
+                    <?php foreach ($articles as $key => $value) { ?>
+                        <div class="carousel-item">
+                            <img class="d-block img-fluid" src="../img/<?= $value['imageArticle'];?>">
+                        </div>
+                    <?php } ?>
                 </div>
                 <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -57,42 +56,29 @@ $bootstrapColWidth = 12 / $numOfCols;
                     <span class="sr-only">Next</span>
                 </a>
             </div>
-            <?php
-            /* Boucle permettant d'afficher tout les articles
-            foreach ($articles as $key => $value) { ?>
-                <div class="col-md-4 container"><img class="img-article" src="../img/<?= $value['imageArticle'];?>">
-                    <div class="middle">
-                        <label><a href="article.php?id=<?= $value['idArticle']; ?>" class="produit-article"><?= $value['nomArticle']; ?></a></label>
-                    </div>
-                </div>
-                <?php
-                $rowCount++;
-                if ($rowCount % $numOfCols == 0) echo '</div><div class="row">';
-            }
-            */ ?>
         </div>
         <div class="row">
             <h1>Les catégories</h1>
         </div>
         <div class="row">
-                <div class="col-xs-12 col-md-4 container">
-                    <img class="img-article" src="../img/t-shirt.jpg">
-                    <div class="middle">
-                        <label><a href="produits.php?categorie=tshirt" class="produit-article">T-shirt</a></label>
-                    </div>
+            <div class="col-xs-12 col-md-4 container">
+                <img class="img-article" src="../img/t-shirt.jpg">
+                <div class="middle">
+                    <label><a href="produits.php?categorie=tshirt" class="produit-article">T-shirt</a></label>
                 </div>
-                <div class="col-md-4 container">
-                    <img class="img-article" src="../img/hoodie.jpg">
-                    <div class="middle">
-                        <label><a href="produits.php?categorie=hoodie" class="produit-article">Hoodie</a></label>
-                    </div>
+            </div>
+            <div class="col-md-4 container">
+                <img class="img-article" src="../img/hoodie.jpg">
+                <div class="middle">
+                    <label><a href="produits.php?categorie=hoodie" class="produit-article">Hoodie</a></label>
                 </div>
-                <div class="col-md-4 container">
-                    <img class="img-article" src="../img/casquette.jpg">
-                    <div class="middle">
-                        <label><a href="produits.php?categorie=casquette" class="produit-article">Casquette</a></label>
-                    </div>
+            </div>
+            <div class="col-md-4 container">
+                <img class="img-article" src="../img/casquette.jpg">
+                <div class="middle">
+                    <label><a href="produits.php?categorie=casquette" class="produit-article">Casquette</a></label>
                 </div>
+            </div>
         </div>
     </section>
 </article>

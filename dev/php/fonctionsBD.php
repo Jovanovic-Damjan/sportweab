@@ -20,34 +20,39 @@ function getConnexion() {
 }
 
 /* Fonction permettant d'afficher les rôles des utilisateurs */
-function getRoles(){
-    try {
+function getRoles()
+{
         $connexion = getConnexion();
         $request = $connexion->prepare("SELECT * FROM utilisateur;");
         $request->execute();
         $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
         return $resultat;
-    } catch (PDOException $e) {
-        throw $e;
-    }
 }
+
+/* Fonction permettant d'afficher les rôles des utilisateurs */
+function getCategories()
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT * FROM categories;");
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
 /* Fonction permettant d'afficher des articles*/
-function getArticles(){
-    try {
+function getArticles()
+{
         $connexion = getConnexion();
         $request = $connexion->prepare("SELECT DISTINCT idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie,prix FROM articles, categories, prix WHERE articles.idPrix = prix.idPrix AND articles.idCategorie = categories.idCategorie ORDER BY idArticle DESC ;");
         $request->execute();
         $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
         return $resultat;
-    } catch (PDOException $e) {
-        throw $e;
-    }
 }
 
 /* Fonction permettant d'afficher les informations de l'article en fonction de l'id de l'article*/
 function getArticleInfo($id){
         $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT DISTINCT idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie,prix FROM articles, categories, prix WHERE articles.idPrix = prix.idPrix AND articles.idCategorie = categories.idCategorie and idArticle = :id;");
+        $request = $connexion->prepare("SELECT DISTINCT articles.idArticle, nomArticle, imageArticle, descriptionArticle, stock, categories.idCategorie ,nomCategorie, prix.prix FROM articles, categories, historiques_prix, prix WHERE articles.idCategorie = categories.idCategorie AND articles.idPrix = historiques_prix.idPrix AND articles.idArticle = historiques_prix.idArticle AND historiques_prix.idPrix = prix.idPrix AND articles.idArticle =:id;");
         $request->bindParam(':id', $id, PDO::PARAM_INT);
         $request->execute();
         return $request->fetchAll(PDO::FETCH_ASSOC);
@@ -57,7 +62,7 @@ function getArticleInfo($id){
 function login($login,$pwd)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT * FROM utilisateurs where mailUtilisateur = :nom and motPasse = :mdp");
+    $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE mailUtilisateur = :nom AND motPasse = :mdp;");
     $request->bindParam(':nom', $login, PDO::PARAM_STR);
     $request->bindParam(':mdp', $pwd, PDO::PARAM_STR);
     $request->execute();
@@ -82,17 +87,14 @@ function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $m
 }
 
 /* Fonction permettant de vérifier s'il y a déjà un utilisateur enregsitré dans la base de données avec le même e-mail*/
-function user_exists($mail){
-    try {
+function user_exists($mail)
+{
         $connexion = getConnexion();
         $requete = $connexion->prepare("SELECT * FROM utilisateurs WHERE mailUtilisateur = :email;");
         $requete->bindParam(':email', $mail, PDO::PARAM_STR);
         $requete->execute();
         $resultat = $requete->fetchAll(PDO::FETCH_ASSOC);
         return $resultat;
-    } catch (PDOException $e) {
-        throw $e;
-    }
 }
 
 
@@ -155,42 +157,84 @@ function getUserRole($email)
 }
 
 /* Fonction permettant de voir les utilisateurs non-validé */
-function getNonValidateUser(){
-    try {
+function getNotValidateUsers()
+{
         $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE typeUtilisateur = '';");
+        $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE typeUtilisateur = 'en attente';");
         $request->execute();
         $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
         return $resultat;
-    } catch (PDOException $e) {
-        throw $e;
-    }
 }
 
-/* Fonction permettant de voir les utilisateurs validé */
-function getValidateUser(){
-    try {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT * FROM utilisateur WHERE typeUtilisateur = 'Utilisateur';");
-        $request->execute();
-        $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-        return $resultat;
-    } catch (PDOException $e) {
-        throw $e;
-    }
+/* Fonction permettant de voir un utilisateur non-validé */
+function getNotValidateUser($email)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE  mailUtilisateur = :mail;");
+    $request->bindParam(':mail', $email, PDO::PARAM_STR);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 /* Fonction permetant de valider un utilisateur */
-function validateUser($idUser) {
-    try {
+function validateUser($idUser)
+{
         $connexion = getConnexion();
         $request = $connexion->prepare("UPDATE utilisateurs SET typeUtilisateur = 'Utilisateur' WHERE idUtilisateur = :id ;");
         $request->bindParam(':id', $idUser, PDO::PARAM_INT);
         $request->execute();
-    } catch (PDOException $e) {
-        throw $e;
-    }
 }
 
+/* Fonction permettant d'ajouter un prix  */
+function addPrice($prix, $date)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `prix` (`prix`, `datePrix`) VALUES (:prix, CURRENT_DATE())");
+    $request->bindParam(':prix', $prix, PDO::PARAM_STR);
+    $request->execute();
+    return $connexion->lastInsertId();
+}
+
+/* Fonction permettant d'ajouter un prix  */
+function addPriceHistoric($idPrix, $idArticle)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `historiques_prix` (`idPrix`, `IdArticle`) VALUES (:idPrix, :idArticle)");
+    $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->execute();
+    return $connexion->lastInsertId();
+}
+
+/* Fonction permettant de créer un utilisateur  */
+function addArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `articles` (`nomArticle`, `imageArticle`, `descriptionArticle`, `stock`, `idCategorie`, `idPrix`) VALUES (:nomArticle, :imageArticle, :descriptionArticle, :stock, :idCategorie, :idPrix)");
+    $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
+    $request->bindParam(':imageArticle', $imageArticle, PDO::PARAM_STR);
+    $request->bindParam(':descriptionArticle', $descriptionArticle, PDO::PARAM_STR);
+    $request->bindParam(':stock', $stock, PDO::PARAM_INT);
+    $request->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+    $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
+    $request->execute();
+    return $connexion->lastInsertId();
+}
+
+/* Fonction permettant de modifier les données des utilisteurs */
+function updateArticle($nomArticle,$imageArticle,$descriptionArticle,$stock,$idCategorie,$idPrix,$idArticle)
+{
+        $connexion = getConnexion();
+        $request = $connexion->prepare("UPDATE articles SET nomArticle = :nomArticle, imageArticle = :imageArticle, descriptionArticle = :descriptionArticle, stock = :stock, idCategorie = :idCategorie, idPrix = :idPrix WHERE idArticle = :idArticle ;");
+        $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
+        $request->bindParam(':imageArticle', $imageArticle, PDO::PARAM_STR);
+        $request->bindParam(':descriptionArticle', $descriptionArticle, PDO::PARAM_STR);
+        $request->bindParam(':stock', $stock, PDO::PARAM_INT);
+        $request->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+        $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
+        $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+        $request->execute();
+}
 
 ?>

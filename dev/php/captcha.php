@@ -8,7 +8,7 @@
 
 function motListe()
 {
-    $liste = array('internet', 'captcha', 'robot', 'sport', 'école');
+    $liste = array('internet', 'captcha', 'robot', 'sport', 'école', 'monde', 'youtube');
     return $liste[array_rand($liste)];
 }
 

@@ -5,7 +5,7 @@ require_once "htmlToPhp.php";
 ?>
 <!doctype html>
 <?php
-if(isset($_GET['id'])) {
+if (isset($_GET['id'])) {
     $idArticle = $_GET['id'];
     $getArticleInfo = getArticleInfo($idArticle);
 }
@@ -34,40 +34,53 @@ if(isset($_GET['id'])) {
     <?php
     /*Boucle permettant d'afficher tout les articles*/
     foreach ($getArticleInfo as $key => $value) { ?>
-    <h1><?= $value['nomArticle'];?></h1>
-    <section>
-        <div class="row">
-            <div class="col-xs-12 col-md-4">
-                <label class="text-article">
-                <p >
-                    <?= $value['descriptionArticle']; ?>
-                </p>
-                <p>
-                    La coupe du tee shirt taille légèrement grand
-                </p>
-                <p>
-                    Envoyé depuis la Suisse.
-                    Temps de livraison estimé à 3-4 jours après l'envoi.
-                </p>
-                    <p>
-                        <select name="taille">
-                            <option value="xs">XS</option>
-                            <option value="s">S</option>
-                            <option value="m">M</option>
-                            <option value="l">L</option>
-                            <option value="xl">XL</option>
-                        </select>
-                    </p>
-                    <p>
-                        <input type="submit" class="btn btn-primary" name="ajoutPanier" value="Ajouter au panier">
-                    </p>
-                </label>
+        <h1><?= $value['nomArticle']; ?></h1>
+        <section>
+            <div class="row">
+                <div class="col-xs-12 col-md-4">
+                    <label class="text-article">
+                        <p>
+                            <?= $value['descriptionArticle']; ?>
+                        </p>
+                        <p>
+                            Envoyé depuis la Suisse.
+                            Temps de livraison estimé à 3-4 jours après l'envoi.
+                        </p>
+                        <p>
+                            Ne pas repasser directement sur les impressions.
+                        </p>
+                        <p>
+                            Catégorie : <u><?= $value['nomCategorie'];?></u>
+                        </p>
+
+                        <p>
+                            Prix : <b><?= $value['prix']; ?></b> CHF
+                        </p>
+                        <p>
+                            Nombre en stock : <b><?= $value['stock']; ?></b>
+                        </p>
+                        <p>
+                            <select name="taille">
+                                <option value="xs">XS</option>
+                                <option value="s">S</option>
+                                <option value="m">M</option>
+                                <option value="l">L</option>
+                                <option value="xl">XL</option>
+                            </select>
+                        </p>
+                        <?php
+                        if ($_SESSION['typeUtilisateur'] == "Administrateur") {
+                            echo '<p><a href="modifierProduit.php?id=' . $idArticle . '" class="btn btn-warning">Modifier l\'article</a></p>';
+                            echo '<p><input type="submit" class="btn btn-danger" name="ajoutPanier" value="Supprimer l\'article"></p>';
+                        }
+                        ?>
+                    </label>
+                </div>
+                <div class="col-md-8">
+                    <img src="../img/<?= $value['imageArticle']; ?>" class="imageArticle">
+                </div>
             </div>
-            <div class="col-md-8">
-                <img src="../img/<?= $value['imageArticle']; ?>" class="imageArticle">
-            </div>
-        </div>
-    </section>
+        </section>
     <?php } ?>
 </article>
 </body>
