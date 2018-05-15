@@ -52,7 +52,7 @@ function getArticles()
 /* Fonction permettant d'afficher les informations de l'article en fonction de l'id de l'article*/
 function getArticleInfo($id){
         $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT DISTINCT articles.idArticle, nomArticle, imageArticle, descriptionArticle, stock, categories.idCategorie ,nomCategorie, prix.prix FROM articles, categories, historiques_prix, prix WHERE articles.idCategorie = categories.idCategorie AND articles.idPrix = historiques_prix.idPrix AND articles.idArticle = historiques_prix.idArticle AND historiques_prix.idPrix = prix.idPrix AND articles.idArticle =:id;");
+        $request = $connexion->prepare("SELECT DISTINCT articles.idArticle, articles.nomArticle, articles.imageArticle, articles.descriptionArticle, articles.stock, categories.nomCategorie, prix.prix FROM articles, categories, historiques_prix, prix WHERE articles.idCategorie = categories.idCategorie AND articles.idPrix = prix.idPrix AND articles.idArticle = :id;");
         $request->bindParam(':id', $id, PDO::PARAM_INT);
         $request->execute();
         return $request->fetchAll(PDO::FETCH_ASSOC);
@@ -187,7 +187,7 @@ function validateUser($idUser)
 }
 
 /* Fonction permettant d'ajouter un prix  */
-function addPrice($prix, $date)
+function addPrice($prix)
 {
     $connexion = getConnexion();
     $request = $connexion->prepare("INSERT INTO `prix` (`prix`, `datePrix`) VALUES (:prix, CURRENT_DATE())");
@@ -235,6 +235,14 @@ function updateArticle($nomArticle,$imageArticle,$descriptionArticle,$stock,$idC
         $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
         $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
         $request->execute();
+}
+
+/* Fonction permettant de supprimer un article */
+function deleteArticle($idArticle) {
+        $connexion = getConnexion();
+        $requete = $connexion->prepare("DELETE FROM articles WHERE articles.idArticle = :idArticle;");
+        $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+        $requete->execute();
 }
 
 ?>

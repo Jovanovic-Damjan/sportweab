@@ -32,6 +32,7 @@ if (isset($_POST['register'])) {
         if ($_POST['captcha'] == $_SESSION['captcha']) {
             if ($password == $confirmPassword) {
                 $password = sha1($password);
+                if($email == true){
                 if (user_exists($email) == false) {
                     if ($array_error == null) {
                         $idUser = registerUser($email, $password);
@@ -39,8 +40,11 @@ if (isset($_POST['register'])) {
                         createWallet($idUser);
                         $success = "Enregistrement avec succès !";
                     }
-                } else {
+                }else {
                     array_push($array_error, "Un compte existe déjà avec l'email : " . $email);
+                }
+                } else{
+                    array_push($array_error, "Veuillez entrer un email valide !");
                 }
             } else {
                 array_push($array_error, "Les mots de passe ne correspondent pas.");

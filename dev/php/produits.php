@@ -14,6 +14,10 @@ if (isset($_GET['categorie'])) {
     $categorie = $_GET['categorie'];
 }
 
+/*if (isset($_GET['delete']) && isset($_GET['id'])) {
+    $id = $_GET['id'];
+    deleteArticle($id);
+}*/
 
 ?>
 <html lang="fr">

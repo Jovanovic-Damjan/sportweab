@@ -2,8 +2,7 @@
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
-{
+if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur") {
     header("Location: index.php");
     exit();
 }
@@ -13,6 +12,7 @@ $dateActuelle = date("Y-m-d");
 
 $array_error = array();
 $success = "";
+
 
 // Fonction qui permet de poster des images
 if (isset($_POST['ajoutProduit'])) {
@@ -24,6 +24,8 @@ if (isset($_POST['ajoutProduit'])) {
         $idCategorie = filter_input(INPUT_POST, 'categorie', FILTER_VALIDATE_INT);
         $nombreStock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
 
+        $extensions_autorisees = array('image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/JPG');
+
         // Variable qui contient un identifiant unique qui sera par la suite ajouté au nom de fichier pour que le nom de fichier soit unique
         $uniqId = uniqid();
 
@@ -34,18 +36,21 @@ if (isset($_POST['ajoutProduit'])) {
         // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
         $imageArticle = $uniqId . "." . $extension;
 
-        // La fonction permet de transférer les fichiers sélectionné dans un répertoire
-        move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
-        if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
-            // On finit par ajouter les fichiers dans la base de données
-            $idPrix = addPrice($prixArticle,$dateActuelle);
-            $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrix);
-            addPriceHistoric($idPrix, $idArticle);
-            $statut = "Article ajouté avec succès !";
+        if (in_array($_FILES['imageArticle']['type'], $extensions_autorisees)) {
+            // La fonction permet de transférer les fichiers sélectionné dans un répertoire
+            move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
+            if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
+                // On finit par ajouter les fichiers dans la base de données
+                $idPrix = addPrice($prixArticle, $dateActuelle);
+                $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrix);
+                addPriceHistoric($idPrix, $idArticle);
+                $statut = "Article ajouté avec succès !";
 
+            }
+        }else{
+            array_push($array_error, "Veuillez sélectionner que des images !");
         }
-    }
-    else{
+    } else {
         array_push($array_error, "Veuillez remplir tous les champs !");
     }
 }
@@ -71,6 +76,15 @@ if (isset($_POST['ajoutProduit'])) {
 <article id="containerAjoutProduit">
     <section>
         <?php
+        /* Test qui permet d'afficher les messages d'erreurs ou les messages de succès */
+        if (count($array_error) > 0) {
+            echo '<div class="alert alert-danger error">';
+            for ($i = 0; $i < count($array_error); $i++) {
+                echo $array_error[$i];
+                echo '<br/>';
+            };
+            echo '</div>';
+        }
         if ($success != "") {
             echo '<div class="alert alert-success" role="alert">';
             echo $success;
@@ -80,7 +94,7 @@ if (isset($_POST['ajoutProduit'])) {
         <form method="post" action="ajouterProduits.php" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nomArticle"><b>Nom de l'article</b></label>
-                <input type="text" class="form-control" required name="nomArticle" placeholder="Le nom de l'article">
+                <input type="text" class="form-control" required name="nomArticle" value="<?php if (isset($nomArticle)) {echo $nomArticle;} ?>" placeholder="Le nom de l'article">
             </div>
             <div class="form-group">
                 <label for="imageArticle"><b>Image de l'article</b></label>
@@ -88,13 +102,12 @@ if (isset($_POST['ajoutProduit'])) {
             </div>
             <div class="form-group">
                 <label for="exampleTextarea"><b>Description de l'article</b></label>
-                <textarea class="form-control" required name="descriptionArticle" rows="3"></textarea>
+                <textarea class="form-control" required name="descriptionArticle" rows="3"><?php if(isset($descriptionArticle)){echo $descriptionArticle;}?></textarea>
             </div>
             <div class="form-group">
                 <label for="example-number-input"><b>Prix de l'article</b></label>
                 <div class="col-10">
-                    <input class="form-control oklm" required name="prixArticle" type="number" min="1" max="100"
-                           value="1">
+                    <input class="form-control oklm" required name="prixArticle" value="<?php if (isset($prixArticle)) {echo $prixArticle;} ?>" type="number" min="1" max="100">
                 </div>
             </div>
             <div class="form-group">
@@ -106,12 +119,15 @@ if (isset($_POST['ajoutProduit'])) {
             <div class="form-group">
                 <label for="example-number-input"><b>Nombre de stock</b></label>
                 <div class="col-10">
-                    <input class="form-control oklm" name="nbStock" type="number" min="1" max="100" value="1">
+                    <input class="form-control oklm" name="nbStock" value="<?php if (isset($nombreStock)) {echo $nombreStock;} ?>" type="number" min="1" max="100" >
                 </div>
             </div>
             <div class="form-group">
                 <button type="submit" name="ajoutProduit" class="btn btn-primary">Ajouter le produit</button>
             </div>
+            <p>
+                <a href="administration.php">retour à l'administration</a>
+            </p>
         </form>
     </section>
 </article>

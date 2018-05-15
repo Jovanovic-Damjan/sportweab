@@ -3,7 +3,7 @@ session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 $idArticle = -1;
-if(isset($_GET['id']) or ) {
+if(isset($_GET['id'])) {
     $idArticle = $_GET['id'];
     $getArticleInfo = getArticleInfo($idArticle);
 }
@@ -15,24 +15,27 @@ if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Admi
 }
 
 $categories = getCategories();
-$dateActuelle = date("Y-m-d");
 
 $array_error = array();
 $success = "";
 
 // Fonction qui permet de poster des images
 if (isset($_POST['modification'])) {
-    if ((!empty($_POST['nomArticle'])) && ($_FILES['imageArticle']['size'] !== 0) && ($_FILES['imageArticle']['error'] == 0) && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock']))) {
+    if ((!empty($_POST['nomArticle']))  && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock']))) {
 
         $nomArticle = filter_input(INPUT_POST, 'nomArticle', FILTER_SANITIZE_STRING);
         $descriptionArticle = filter_input(INPUT_POST, 'descriptionArticle', FILTER_SANITIZE_STRING);
         $prixArticle = filter_input(INPUT_POST, 'prixArticle', FILTER_VALIDATE_FLOAT);
         $idCategorie = filter_input(INPUT_POST, 'categorie', FILTER_SANITIZE_STRING);
         $stock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
+        $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
+        $imageArticle = filter_input(INPUT_POST, 'imageArticle', FILTER_SANITIZE_STRING);
+        $imageActuelle = filter_input(INPUT_POST, 'imageActuelle', FILTER_SANITIZE_STRING);
 
+
+        if(($imageArticle !== null)){
         // Variable qui contient un identifiant unique qui sera par la suite ajouté au nom de fichier pour que le nom de fichier soit unique
         $uniqId = uniqid();
-
         $count = explode('.', $_FILES['imageArticle']['name']);
         $count2 = strlen($count[1]);
         $extension = substr($_FILES['imageArticle']['name'], -$count2);
@@ -40,14 +43,20 @@ if (isset($_POST['modification'])) {
         // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
         $imageArticle = $uniqId . "." . $extension;
 
+
+
+
         // La fonction permet de transférer les fichiers sélectionné dans un répertoire
         move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
         if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
             // On finit par ajouter les fichiers dans la base de données
-            $idPrix = addPrice($prixArticle,$dateActuelle);
+            $idPrix = addPrice($prixArticle);
             updateArticle($nomArticle,$imageArticle,$descriptionArticle,$stock,$idCategorie,$idPrix,$idArticle);
             $statut = "Article modifié avec succès !";
-
+        }
+        }elseif(($imageArticle == null) && ($imageActuelle !== null)){
+            $idPrix = addPrice($prixArticle);
+            updateArticle($nomArticle,$imageActuelle,$descriptionArticle,$stock,$idCategorie,$idPrix,$idArticle);
         }
     }
     else{
@@ -90,6 +99,8 @@ if (isset($_POST['modification'])) {
             </div>
             <div class="form-group">
                 <label for="imageArticle"><b>Image de l'article</b></label>
+                <img src="../img/<?= $value['imageArticle'];?>">
+                <input type="text" name="imageActuelle" value="<?= $value['imageArticle'];?>">
                 <input type="file" class="form-control-file" accept="image/*" required name="imageArticle">
             </div>
             <div class="form-group">
@@ -117,10 +128,12 @@ if (isset($_POST['modification'])) {
 
                 <div class="form-group">
                     <div class="col-10">
-                        <input class="form-control oklm"  name="nbStock" value="<?= $idArticle; ?>" type="hidden">
+                        <input class="form-control oklm"  name="idArticle" value="<?= $idArticle; ?>" type="hidden">
                     </div>
                 </div>
+
             <?php } ?>
+
             <div class="form-group">
                 <button type="submit" name="modification" class="btn btn-primary">Modifier le produit</button>
             </div>
