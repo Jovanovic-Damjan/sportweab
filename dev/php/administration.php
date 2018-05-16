@@ -7,7 +7,7 @@ require_once "htmlToPhp.php";
 if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
 {
     header("Location: index.php");
-    exit();
+    die();
 }
 ?>
 <!doctype html>

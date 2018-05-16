@@ -20,6 +20,7 @@ if (isset($_POST['Submit'])) {
                     if (!empty($informationsClient)) {
                         if (count($informationsClient) > 0) {
                             $_SESSION["connecte"] = true;
+                            $_SESSION["idClient"] = $informationsClient[0]['idClient'];
                             $_SESSION["idUtilisateur"] = $informationsClient[0]["idUtilisateur"];
                             $_SESSION["login"] = $informationsClient[0]["nomClient"] . " " . $informationsClient[0]["prenomClient"];
                             $_SESSION["typeUtilisateur"] = $informationsClient[0]["typeUtilisateur"];

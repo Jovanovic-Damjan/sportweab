@@ -200,7 +200,7 @@ function addPrice($prix)
 function addPriceHistoric($idPrix, $idArticle)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `historiques_prix` (`idPrix`, `IdArticle`) VALUES (:idPrix, :idArticle)");
+    $request = $connexion->prepare("INSERT INTO `historiques_prix` (`idPrix`, `idArticle`) VALUES (:idPrix, :idArticle)");
     $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
     $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
     $request->execute();
@@ -245,4 +245,75 @@ function deleteArticle($idArticle) {
         $requete->execute();
 }
 
+/* Fonction permettant de modifier les données des utilisteurs */
+function checkoutCart($nomArticle, $idClient)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE panier_commandes SET numCommande = :numCommande, dateCommande = CURRENT_DATE() WHERE idClient = :idClient ;");
+    $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $request->execute();
+}
+
+/* Fonction permettant d'ajouter un article dans son panier */
+function addArticleToCart($taille, $idClient, $idArticle)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE articles SET stock = stock - 1 WHERE idArticle = :idArticle AND stock > 0 ;");
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->execute();
+    $request = $connexion->prepare("INSERT INTO `panier_commandes` (`taille`, `idClient`, `idArticle`) VALUES (:taille, :idClient, :idArticle)");
+    $request->bindParam(':taille', $taille, PDO::PARAM_STR);
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->execute();
+    return $connexion->lastInsertId();
+}
+
+/* Fonction permettant d'ajouter un prix  */
+function CommandConcernArticle($idArticle, $idCommande)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `articles_concernant_commande` (`idArticle`, `idCommande`) VALUES (:idArticle, :idCommande)");
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $request->execute();
+}
+
+/* Fonction permettant d'ajouter un prix  */
+function CommandConcernClient($idClient, $idCommande)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `client_passant_commande` (`idClient`, `idCommande`) VALUES (:idClient, :idCommande)");
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $request->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $request->execute();
+}
+
+function getCart($idClient)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT DISTINCT panier_commandes.idCommande, articles.idArticle, articles.nomArticle, articles.imageArticle, taille, prix.prix FROM panier_commandes, articles, prix, historiques_prix, clients, client_passant_commande WHERE panier_commandes.idArticle = articles.idArticle AND panier_commandes.idClient = client_passant_commande.idClient AND articles.idPrix = prix.idPrix AND panier_commandes.idClient = :idClient;");
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $request->execute();
+    return $request->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function deleteArticleFromCart($idArticle, $idClient, $idCommande)
+{
+    $connexion = getConnexion();
+    $requete = $connexion->prepare("DELETE FROM panier_commandes WHERE panier_commandes.idArticle = :idArticle AND panier_commandes.idClient = :idClient AND panier_commandes.idCommande = :idCommande;");
+    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $requete->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $requete->execute();
+    /*$requete = $connexion->prepare("DELETE FROM articles_concernant_commande WHERE idArticle = :idArticle AND idCommande = :idCommande;");
+    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $requete->execute();
+    $requete = $connexion->prepare("DELETE FROM client_passant_commande WHERE idClient = :idClient AND idCommande = :idCommande;");
+    $requete->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $requete->execute();*/
+}
 ?>

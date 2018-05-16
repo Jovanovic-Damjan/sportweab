@@ -2,9 +2,7 @@
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-?>
-<!doctype html>
-<?php
+
 $articles = getArticles();
 $numOfCols = 3;
 $rowCount = 0;
@@ -14,10 +12,9 @@ if (isset($_GET['categorie'])) {
     $categorie = $_GET['categorie'];
 }
 
-/*if (isset($_GET['delete']) && isset($_GET['id'])) {
-    $id = $_GET['id'];
-    deleteArticle($id);
-}*/
+?>
+<!doctype html>
+<?php
 
 ?>
 <html lang="fr">

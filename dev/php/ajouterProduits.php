@@ -4,7 +4,7 @@ require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur") {
     header("Location: index.php");
-    exit();
+    die();
 }
 
 $categories = getCategories();
@@ -25,30 +25,37 @@ if (isset($_POST['ajoutProduit'])) {
         $nombreStock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
 
         $extensions_autorisees = array('image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/JPG');
+        if (($nombreStock > 0) && ($nombreStock <= 100)) {
+            if (($prixArticle > 0) && ($prixArticle <= 150)) {
+                // Variable qui contient un identifiant unique qui sera par la suite ajouté au nom de fichier pour que le nom de fichier soit unique
+                $uniqId = uniqid();
 
-        // Variable qui contient un identifiant unique qui sera par la suite ajouté au nom de fichier pour que le nom de fichier soit unique
-        $uniqId = uniqid();
+                $count = explode('.', $_FILES['imageArticle']['name']);
+                $count2 = strlen($count[1]);
+                $extension = substr($_FILES['imageArticle']['name'], -$count2);
 
-        $count = explode('.', $_FILES['imageArticle']['name']);
-        $count2 = strlen($count[1]);
-        $extension = substr($_FILES['imageArticle']['name'], -$count2);
+                // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
+                $imageArticle = $uniqId . "." . $extension;
 
-        // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
-        $imageArticle = $uniqId . "." . $extension;
-
-        if (in_array($_FILES['imageArticle']['type'], $extensions_autorisees)) {
-            // La fonction permet de transférer les fichiers sélectionné dans un répertoire
-            move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
-            if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
-                // On finit par ajouter les fichiers dans la base de données
-                $idPrix = addPrice($prixArticle, $dateActuelle);
-                $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrix);
-                addPriceHistoric($idPrix, $idArticle);
-                $statut = "Article ajouté avec succès !";
-
+                if (in_array($_FILES['imageArticle']['type'], $extensions_autorisees)) {
+                    // La fonction permet de transférer les fichiers sélectionné dans un répertoire
+                    move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
+                    if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
+                        // On finit par ajouter les fichiers dans la base de données
+                        $idPrix = addPrice($prixArticle, $dateActuelle);
+                        $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrix);
+                        addPriceHistoric($idPrix, $idArticle);
+                        header('Location: ajouterProduits.php');
+                        die();
+                    }
+                } else {
+                    array_push($array_error, "Veuillez sélectionner que des images !");
+                }
+            } else {
+                array_push($array_error, "Veuillez entrer une valeur entre 1 et 100 pour le stock!");
             }
-        }else{
-            array_push($array_error, "Veuillez sélectionner que des images !");
+        } else {
+            array_push($array_error, "Veuillez entrer une valeur entre 1 et 150 pour le prix!");
         }
     } else {
         array_push($array_error, "Veuillez remplir tous les champs !");
@@ -94,7 +101,10 @@ if (isset($_POST['ajoutProduit'])) {
         <form method="post" action="ajouterProduits.php" enctype="multipart/form-data">
             <div class="form-group">
                 <label for="nomArticle"><b>Nom de l'article</b></label>
-                <input type="text" class="form-control" required name="nomArticle" value="<?php if (isset($nomArticle)) {echo $nomArticle;} ?>" placeholder="Le nom de l'article">
+                <input type="text" class="form-control" required name="nomArticle"
+                       value="<?php if (isset($nomArticle)) {
+                           echo $nomArticle;
+                       } ?>" placeholder="Le nom de l'article">
             </div>
             <div class="form-group">
                 <label for="imageArticle"><b>Image de l'article</b></label>
@@ -102,12 +112,17 @@ if (isset($_POST['ajoutProduit'])) {
             </div>
             <div class="form-group">
                 <label for="exampleTextarea"><b>Description de l'article</b></label>
-                <textarea class="form-control" required name="descriptionArticle" rows="3"><?php if(isset($descriptionArticle)){echo $descriptionArticle;}?></textarea>
+                <textarea class="form-control" required name="descriptionArticle"
+                          rows="3"><?php if (isset($descriptionArticle)) {
+                        echo $descriptionArticle;
+                    } ?></textarea>
             </div>
             <div class="form-group">
                 <label for="example-number-input"><b>Prix de l'article</b></label>
                 <div class="col-10">
-                    <input class="form-control oklm" required name="prixArticle" value="<?php if (isset($prixArticle)) {echo $prixArticle;} ?>" type="number" min="1" max="100">
+                    <input class="form-control oklm" required name="prixArticle" value="<?php if (isset($prixArticle)) {
+                        echo $prixArticle;
+                    } ?>" type="number" min="1" max="100">
                 </div>
             </div>
             <div class="form-group">
@@ -119,7 +134,9 @@ if (isset($_POST['ajoutProduit'])) {
             <div class="form-group">
                 <label for="example-number-input"><b>Nombre de stock</b></label>
                 <div class="col-10">
-                    <input class="form-control oklm" name="nbStock" value="<?php if (isset($nombreStock)) {echo $nombreStock;} ?>" type="number" min="1" max="100" >
+                    <input class="form-control oklm" name="nbStock" value="<?php if (isset($nombreStock)) {
+                        echo $nombreStock;
+                    } ?>" type="number" min="1" max="100">
                 </div>
             </div>
             <div class="form-group">

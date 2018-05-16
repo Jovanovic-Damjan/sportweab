@@ -41,7 +41,7 @@ if (isset($_POST['register'])) {
                         $success = "Enregistrement avec succès !";
                     }
                 }else {
-                    array_push($array_error, "Un compte existe déjà avec l'email : " . $email);
+                    array_push($array_error, "Un compte existe déjà avec l'email :" . $email);
                 }
                 } else{
                     array_push($array_error, "Veuillez entrer un email valide !");
@@ -100,6 +100,8 @@ exit();
         if ($success != "") {
             echo '<div class="alert alert-success" role="alert">';
             echo $success;
+            echo '<br>';
+            echo '<a href="connexion.php">Se connecter !</a>';
             echo '</div>';
         }
         ?>

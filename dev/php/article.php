@@ -3,16 +3,29 @@ session_start();
 
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-
+if(isset($_SESSION['idClient'])) {
+    $idClient = $_SESSION['idClient'];
+}
 if (isset($_GET['id'])) {
     $idArticle = $_GET['id'];
     $getArticleInfo = getArticleInfo($idArticle);
 }
-$info = "";
+
+$success = "";
 if (isset($_POST['delete'])) {
     deleteArticle($_POST['idArticle']);
     header('Location: produits.php');
-    exit();
+    die();
+}
+
+if (isset($_POST['ajoutPanier'])) {
+    $taille = filter_input(INPUT_POST, 'taille', FILTER_SANITIZE_STRING);
+    $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
+    $idCommand = addArticleToCart($taille,$idClient,$idArticle);
+    CommandConcernArticle($idArticle,$idCommand);
+    CommandConcernClient($idClient,$idCommand);
+    header('Location: produits.php');
+    die();
 }
 ?>
 <!doctype html>
@@ -39,9 +52,14 @@ if (isset($_POST['delete'])) {
 <article>
     <section>
         <?php
+        if($success !== ""){
+            echo '<div class="alert alert-success message"><strong>'.$success.'</strong></br><a href="produits.php" class="message">Retour à la page des produits</a></div>';
+        }
         /*Boucle permettant d'afficher tout les articles*/
-        if(isset($_GET['id'])){
-        foreach ($getArticleInfo as $key => $value) {
+        if (isset($_GET['id'])){
+        foreach ($getArticleInfo
+
+        as $key => $value) {
         ?>
         <h1><?= $value['nomArticle']; ?></h1>
         <form method="post" action="article.php">
@@ -66,19 +84,11 @@ if (isset($_POST['delete'])) {
                             Prix : <b><?= $value['prix']; ?></b> CHF
                         </p>
                         <p>
-                            Nombre en stock : <b><?= $value['stock']; ?></b>
-                        </p>
-                        <p>
-                            <select name="taille">
-                                <option value="xs">XS</option>
-                                <option value="s">S</option>
-                                <option value="m">M</option>
-                                <option value="l">L</option>
-                                <option value="xl">XL</option>
-                            </select>
+                            Nombre en stock : <b><?php if($value['stock'] !== null && $value['stock'] > 0){echo $value['stock'];}elseif($value['stock'] == 0){echo "Rupture de stock";} ?></b>
                         </p>
                         <?php
-                        if ($_SESSION['typeUtilisateur'] == "Administrateur") {
+
+                        if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] == "Administrateur") {
                             echo '<p><a href="modifierProduit.php?id=' . $idArticle . '" class="btn btn-warning">Modifier l\'article</a></p>';
                             /* Code pour afficher une popup en Bootstrap */
                             echo "<!-- Button trigger modal -->
@@ -108,6 +118,19 @@ if (isset($_POST['delete'])) {
     </div>
   </div>
 </div>";
+                        } elseif (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] == "Utilisateur") {
+                            echo '<p>
+                            <select name="taille">
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                            </select>
+                        </p>';
+                            echo '<p><input type="submit" name="ajoutPanier" class="btn btn-primary" value="Ajouter au panier"></p>';
+                        } elseif (!isset($_SESSION['typeUtilisateur'])) {
+                            echo '<div class="alert alert-warning" role="alert">Veuillez vous connecter pour ajouter des articles dans votre panier.</div>';
                         }
                         ?>
                         <p>
@@ -121,6 +144,7 @@ if (isset($_POST['delete'])) {
             </div>
         </form>
     </section>
-    <?php } } ?>
+    <?php }
+    } ?>
 </article>
 </body>
