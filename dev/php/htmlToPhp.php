@@ -6,8 +6,14 @@
  * Time: 15:16
  */
 
+
 function menu()
 {
+    if (isset($_SESSION['idClient'])) {
+        $idClient = $_SESSION['idClient'];
+    }
+    $panier = getCart($idClient);
+
     echo "<nav class='navbar navbar-expand-lg navbar-light bg-white'>
     <button class='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarSupportedContent' aria-controls='navbarSupportedContent' aria-expanded='false' aria-label='Toggle navigation'>
         <span class='navbar-toggler-icon'></span>
@@ -26,7 +32,7 @@ function menu()
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Utilisateur")) {
         echo "<li class='nav-item'>" . $_SESSION["login"] . "</li>";
-        echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier</a></li>";
+        echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier<span class=\"badge badge-pill badge-dark\">".count($panier)."</span></a></li>";
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif (!isset($_SESSION["login"])) {
         echo "<li class='nav-item'><a class='nav-link' href='connexion.php'>Login</a></li>";

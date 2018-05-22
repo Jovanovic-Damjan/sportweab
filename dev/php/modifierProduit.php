@@ -20,13 +20,14 @@ $success = "";
 
 // Fonction qui permet de poster des images
 if (isset($_POST['modification'])) {
-    if ((!empty($_POST['nomArticle'])) && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock']))) {
+    if ((!empty($_POST['nomArticle'])) && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock'])) && (!empty($_POST['dateFin']))) {
 
         $nomArticle = filter_input(INPUT_POST, 'nomArticle', FILTER_SANITIZE_STRING);
         $descriptionArticle = filter_input(INPUT_POST, 'descriptionArticle', FILTER_SANITIZE_STRING);
         $prixArticle = filter_input(INPUT_POST, 'prixArticle', FILTER_VALIDATE_FLOAT);
         $idCategorie = filter_input(INPUT_POST, 'categorie', FILTER_SANITIZE_STRING);
         $stock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
+        $dateFin = filter_input(INPUT_POST, 'dateFin', FILTER_SANITIZE_STRING);
         $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
         $imageActuelle = filter_input(INPUT_POST, 'imageActuelle', FILTER_SANITIZE_STRING);
 
@@ -48,17 +49,23 @@ if (isset($_POST['modification'])) {
                         move_uploaded_file($_FILES['uploadImageArticle']['tmp_name'], "../img/$imageArticle");
                         if (!is_uploaded_file($_FILES['uploadImageArticle']['tmp_name'])) {
                             // On finit par ajouter les fichiers dans la base de données
-                            $idPrix = addPrice($prixArticle);
-                            updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
-                            header('Location: produits.php');
-                            die();
-
-                        }
+                            if($dateFin == "") {
+                                $dateFin = null;
+                            }
+                                $idPrix = addPrice($prixArticle, $dateDebut, $dateFin, $idArticle);
+                                updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
+                                header('Location: produits.php');
+                                die();
+                            }
                     } else {
                         array_push($array_error, "Veuillez sélectionner que des images !");
                     }
                 } else {
-                    $idPrix = addPrice($prixArticle);
+                    if($dateFin == "") {
+                        $dateFin = null;
+                    }
+                    updatePrice($idArticle,$prixArticle);
+                    $idPrix = addPrice($prixArticle, $dateFin, $idArticle);
                     updateArticle($nomArticle, $imageActuelle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
                     header('Location: produits.php');
                     die();
@@ -85,6 +92,9 @@ if (isset($_POST['modification'])) {
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link href="../css/bootstrap.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
 </head>
 <body>
 <?= menu(); ?>
@@ -128,7 +138,13 @@ if (isset($_POST['modification'])) {
                         <label for="example-number-input"><b>Prix de l'article</b></label>
                         <div class="col-10">
                             <input class="form-control oklm" required value="<?= $value['prix']; ?>" name="prixArticle"
-                                   type="number" min="1" max="100">
+                                   type="number" min="1" max="150">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="example-number-input"><b>Date fin du prix</b></label>
+                        <div class="col-10">
+                            <input type="date" id="dateFin" min="<?= date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));?>" class="form-control oklm"  value="<?= $value['prix']; ?>" name="dateFin">
                         </div>
                     </div>
                     <div class="form-group">
@@ -164,3 +180,10 @@ if (isset($_POST['modification'])) {
 </article>
 </body>
 </html>
+<script>
+    $("#dateDebut").change(function() {
+        $("#dateFin").attr({
+            "min" : $("#dateDebut").val()
+        });
+    });
+</script>

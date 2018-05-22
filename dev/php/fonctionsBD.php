@@ -4,7 +4,8 @@ define('DB_NAME', "sportweab"); //nom de la base de donnée.
 define('DB_USER', "sportweab"); //utilisateur.
 define('DB_PASS', "1202"); //mdp.
 /* Fonction permettant la connexion à la base de données  */
-function getConnexion() {
+function getConnexion()
+{
     static $dbb = null;
     if ($dbb === null) {
         try {
@@ -22,11 +23,11 @@ function getConnexion() {
 /* Fonction permettant d'afficher les rôles des utilisateurs */
 function getRoles()
 {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT * FROM utilisateur;");
-        $request->execute();
-        $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-        return $resultat;
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT * FROM utilisateur;");
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 /* Fonction permettant d'afficher les rôles des utilisateurs */
@@ -39,27 +40,73 @@ function getCategories()
     return $resultat;
 }
 
-/* Fonction permettant d'afficher des articles*/
-function getArticles()
+/* Fonction permettant d'afficher les rôles des utilisateurs */
+function getImage()
 {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT DISTINCT idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie,prix FROM articles, categories, prix WHERE articles.idPrix = prix.idPrix AND articles.idCategorie = categories.idCategorie ORDER BY idArticle DESC ;");
-        $request->execute();
-        $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-        return $resultat;
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT imageArticle FROM articles;");
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+/* Fonction permettant d'afficher des articles*/
+function getArticles($categorie,$order,$way)
+{
+    $query = "SELECT DISTINCT articles.idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie, max(prixarticles.dateDebut), prixarticles.prix FROM articles, categories, prixarticles WHERE articles.idArticle = prixarticles.idArticle AND articles.idCategorie = categories.idCategorie AND articles.idPrixArticle = prixarticles.idPrixArticle ";
+    switch ($categorie){
+        case "hoodie" : $query .= " AND nomCategorie = \"hoodie\" GROUP BY articles.idArticle ORDER BY ";
+        break;
+        case "casquette" : $query .= " AND nomCategorie = \"casquette\" GROUP BY articles.idArticle ORDER BY ";
+            break;
+        case "T-shirt" : $query .= " AND nomCategorie = \"T-shirt\" GROUP BY articles.idArticle ORDER BY ";
+            break;
+        default : $query .= " GROUP BY articles.idArticle ORDER BY ";
+    }
+    switch ($order){
+        case "prix" : $query .= " prix ";
+            break;
+        case "nomCategorie" : $query .= " nomCategorie ";
+            break;
+        default : $query .= " articles.idArticle DESC ";
+    }
+    switch ($way){
+        case "ASC" : $query .= " ASC;";
+        break;
+        case "DESC" : $query .= " DESC;";
+        break;
+        default :$query .= ";";
+    }
+    $connexion = getConnexion();
+    $request = $connexion->prepare($query);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+/* Fonction permettant de voir un utilisateur non-validé */
+function getArticleByCategories($categorie)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT articles.idArticle, nomArticle, prix, nomCategorie FROM articles, categories, prixarticles WHERE articles.idCategorie = categories.idCategorie AND articles.idPrixArticle = prixarticles.idPrixArticle AND nomCategorie = :categorie;");
+    $request->bindParam(':categorie', $categorie, PDO::PARAM_STR);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 /* Fonction permettant d'afficher les informations de l'article en fonction de l'id de l'article*/
-function getArticleInfo($id){
-        $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT DISTINCT articles.idArticle, articles.nomArticle, articles.imageArticle, articles.descriptionArticle, articles.stock, categories.nomCategorie, prix.prix FROM articles, categories, historiques_prix, prix WHERE articles.idCategorie = categories.idCategorie AND articles.idPrix = prix.idPrix AND articles.idArticle = :id;");
-        $request->bindParam(':id', $id, PDO::PARAM_INT);
-        $request->execute();
-        return $request->fetchAll(PDO::FETCH_ASSOC);
+function getArticleInfo($id)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT DISTINCT articles.idArticle, articles.nomArticle, articles.imageArticle, articles.descriptionArticle, articles.stock, categories.nomCategorie, articles.idPrixArticle, prixarticles.idPrixArticle, prixarticles.prix, MAX(dateDebut), dateFin FROM articles, categories INNER JOIN prixarticles WHERE articles.idPrixArticle = prixarticles.idPrixArticle AND articles.idCategorie = categories.idCategorie AND prixarticles.idArticle = :idArticle ORDER BY prixarticles.dateDebut ASC;");
+    $request->bindParam(':idArticle', $id, PDO::PARAM_INT);
+    $request->execute();
+    return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
 /* Fonction permettant de se connecter  */
-function login($login,$pwd)
+function login($login, $pwd)
 {
     $connexion = getConnexion();
     $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE mailUtilisateur = :nom AND motPasse = :mdp;");
@@ -89,12 +136,12 @@ function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $m
 /* Fonction permettant de vérifier s'il y a déjà un utilisateur enregsitré dans la base de données avec le même e-mail*/
 function user_exists($mail)
 {
-        $connexion = getConnexion();
-        $requete = $connexion->prepare("SELECT * FROM utilisateurs WHERE mailUtilisateur = :email;");
-        $requete->bindParam(':email', $mail, PDO::PARAM_STR);
-        $requete->execute();
-        $resultat = $requete->fetchAll(PDO::FETCH_ASSOC);
-        return $resultat;
+    $connexion = getConnexion();
+    $requete = $connexion->prepare("SELECT * FROM utilisateurs WHERE mailUtilisateur = :email;");
+    $requete->bindParam(':email', $mail, PDO::PARAM_STR);
+    $requete->execute();
+    $resultat = $requete->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 
@@ -159,11 +206,11 @@ function getUserRole($email)
 /* Fonction permettant de voir les utilisateurs non-validé */
 function getNotValidateUsers()
 {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE typeUtilisateur = 'en attente';");
-        $request->execute();
-        $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-        return $resultat;
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE typeUtilisateur = 'en attente';");
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 /* Fonction permettant de voir un utilisateur non-validé */
@@ -180,94 +227,115 @@ function getNotValidateUser($email)
 /* Fonction permetant de valider un utilisateur */
 function validateUser($idUser)
 {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("UPDATE utilisateurs SET typeUtilisateur = 'Utilisateur' WHERE idUtilisateur = :id ;");
-        $request->bindParam(':id', $idUser, PDO::PARAM_INT);
-        $request->execute();
-}
-
-/* Fonction permettant d'ajouter un prix  */
-function addPrice($prix)
-{
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `prix` (`prix`, `datePrix`) VALUES (:prix, CURRENT_DATE())");
-    $request->bindParam(':prix', $prix, PDO::PARAM_STR);
+    $request = $connexion->prepare("UPDATE utilisateurs SET typeUtilisateur = 'Utilisateur' WHERE idUtilisateur = :id ;");
+    $request->bindParam(':id', $idUser, PDO::PARAM_INT);
     $request->execute();
-    return $connexion->lastInsertId();
 }
 
 /* Fonction permettant d'ajouter un prix  */
-function addPriceHistoric($idPrix, $idArticle)
+function addPrice($prixArticle, $dateFin, $idArticle)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `historiques_prix` (`idPrix`, `idArticle`) VALUES (:idPrix, :idArticle)");
-    $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
+    $request = $connexion->prepare("INSERT INTO `prixarticles` (`prix`, `dateDebut`, `dateFin`, `idArticle`) VALUES (:prix, CURRENT_DATE(), :dateFin, :idArticle)");
+    $request->bindParam(':prix', $prixArticle, PDO::PARAM_STR);
+    $request->bindParam(':dateFin', $dateFin, PDO::PARAM_STR);
     $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
     $request->execute();
     return $connexion->lastInsertId();
 }
 
-/* Fonction permettant de créer un utilisateur  */
-function addArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix)
+/* Fonction permetant de valider un utilisateur */
+function updatePrice($idArticle, $idPrixArticle)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `articles` (`nomArticle`, `imageArticle`, `descriptionArticle`, `stock`, `idCategorie`, `idPrix`) VALUES (:nomArticle, :imageArticle, :descriptionArticle, :stock, :idCategorie, :idPrix)");
+    $request = $connexion->prepare("UPDATE prixarticles SET dateFin = current_date() WHERE dateDebut = (SELECT MAX(dateDebut) WHERE idArticle = :idArticle AND idPrixArticle = :idPrixArticle);");
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->bindParam(':idPrixArticle', $idPrixArticle, PDO::PARAM_INT);
+    $request->execute();
+}
+
+/* Fonction permetant de valider un utilisateur */
+function updatePriceArticle($idArticle, $idPrixArticle)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE prixarticles SET idArticle = :idArticle WHERE idPrixArticle = :idPrixArticle;");
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->bindParam(':idPrixArticle', $idPrixArticle, PDO::PARAM_INT);
+    $request->execute();
+}
+
+/* Fonction permettant de créer un utilisateur  */
+function addArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrixArticle)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `articles` (`nomArticle`, `imageArticle`, `descriptionArticle`, `stock`, `idCategorie`, `idPrixArticle`) VALUES (:nomArticle, :imageArticle, :descriptionArticle, :stock, :idCategorie, :idPrixArticle)");
     $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
     $request->bindParam(':imageArticle', $imageArticle, PDO::PARAM_STR);
     $request->bindParam(':descriptionArticle', $descriptionArticle, PDO::PARAM_STR);
     $request->bindParam(':stock', $stock, PDO::PARAM_INT);
     $request->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
-    $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
+    $request->bindParam(':idPrixArticle', $idPrixArticle, PDO::PARAM_INT);
     $request->execute();
     return $connexion->lastInsertId();
 }
 
 /* Fonction permettant de modifier les données des utilisteurs */
-function updateArticle($nomArticle,$imageArticle,$descriptionArticle,$stock,$idCategorie,$idPrix,$idArticle)
+function updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrixArticle, $idArticle)
 {
-        $connexion = getConnexion();
-        $request = $connexion->prepare("UPDATE articles SET nomArticle = :nomArticle, imageArticle = :imageArticle, descriptionArticle = :descriptionArticle, stock = :stock, idCategorie = :idCategorie, idPrix = :idPrix WHERE idArticle = :idArticle ;");
-        $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
-        $request->bindParam(':imageArticle', $imageArticle, PDO::PARAM_STR);
-        $request->bindParam(':descriptionArticle', $descriptionArticle, PDO::PARAM_STR);
-        $request->bindParam(':stock', $stock, PDO::PARAM_INT);
-        $request->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
-        $request->bindParam(':idPrix', $idPrix, PDO::PARAM_INT);
-        $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
-        $request->execute();
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE articles SET nomArticle = :nomArticle, imageArticle = :imageArticle, descriptionArticle = :descriptionArticle, stock = :stock, idCategorie = :idCategorie, idPrixArticle = :idPrixArticle WHERE idArticle = :idArticle;");
+    $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
+    $request->bindParam(':imageArticle', $imageArticle, PDO::PARAM_STR);
+    $request->bindParam(':descriptionArticle', $descriptionArticle, PDO::PARAM_STR);
+    $request->bindParam(':stock', $stock, PDO::PARAM_INT);
+    $request->bindParam(':idCategorie', $idCategorie, PDO::PARAM_INT);
+    $request->bindParam(':idPrixArticle', $idPrixArticle, PDO::PARAM_INT);
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->execute();
 }
 
 /* Fonction permettant de supprimer un article */
-function deleteArticle($idArticle) {
-        $connexion = getConnexion();
-        $requete = $connexion->prepare("DELETE FROM articles WHERE articles.idArticle = :idArticle;");
-        $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
-        $requete->execute();
+function deleteArticle($idArticle)
+{
+    $connexion = getConnexion();
+    $requete = $connexion->prepare("DELETE FROM articles WHERE articles.idArticle = :idArticle;");
+    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $requete->execute();
 }
 
 /* Fonction permettant de modifier les données des utilisteurs */
-function checkoutCart($nomArticle, $idClient)
+function checkoutCart($numCommande, $idClient)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("UPDATE panier_commandes SET numCommande = :numCommande, dateCommande = CURRENT_DATE() WHERE idClient = :idClient ;");
-    $request->bindParam(':nomArticle', $nomArticle, PDO::PARAM_STR);
+    $request = $connexion->prepare("UPDATE panier_commandes SET numCommande = :numCommande WHERE idClient = :idClient ;");
+    $request->bindParam(':numCommande', $numCommande, PDO::PARAM_STR);
     $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
     $request->execute();
 }
 
 /* Fonction permettant d'ajouter un article dans son panier */
-function addArticleToCart($taille, $idClient, $idArticle)
+function addArticleToCart($taille, $idClient, $idArticle, $idPrixArticle)
 {
     $connexion = getConnexion();
     $request = $connexion->prepare("UPDATE articles SET stock = stock - 1 WHERE idArticle = :idArticle AND stock > 0 ;");
     $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
     $request->execute();
-    $request = $connexion->prepare("INSERT INTO `panier_commandes` (`taille`, `idClient`, `idArticle`) VALUES (:taille, :idClient, :idArticle)");
+    $request = $connexion->prepare("INSERT INTO `panier_commandes` (`dateCommande`, `taille`, `idClient`, `idPrixArticle`) VALUES (CURRENT_DATE(), :taille, :idClient, :idPrixArticle)");
     $request->bindParam(':taille', $taille, PDO::PARAM_STR);
     $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
-    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->bindParam(':idPrixArticle', $idPrixArticle, PDO::PARAM_INT);
     $request->execute();
     return $connexion->lastInsertId();
+}
+
+/* Fonction permettant d'ajouter un article dans son panier */
+function updateStock($idArticle)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE articles SET stock = stock + 1 WHERE idArticle = :idArticle AND stock >= 0 ;");
+    $request->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $request->execute();
 }
 
 /* Fonction permettant d'ajouter un prix  */
@@ -293,27 +361,69 @@ function CommandConcernClient($idClient, $idCommande)
 function getCart($idClient)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT DISTINCT panier_commandes.idCommande, articles.idArticle, articles.nomArticle, articles.imageArticle, taille, prix.prix FROM panier_commandes, articles, prix, historiques_prix, clients, client_passant_commande WHERE panier_commandes.idArticle = articles.idArticle AND panier_commandes.idClient = client_passant_commande.idClient AND articles.idPrix = prix.idPrix AND panier_commandes.idClient = :idClient;");
+    $request = $connexion->prepare("SELECT distinct panier_commandes.idCommande, articles.idArticle, articles.nomArticle, articles.imageArticle , prixarticles.prix, panier_commandes.taille,  prixarticles.dateDebut, prixarticles.dateFin, panier_commandes.dateCommande,panier_commandes.idClient FROM panier_commandes, articles, client_passant_commande, clients, prixarticles, articles_concernant_commande WHERE panier_commandes.idCommande = articles_concernant_commande.idCommande AND articles_concernant_commande.idArticle = articles.idArticle AND panier_commandes.idCommande = client_passant_commande.idCommande AND panier_commandes.idPrixArticle = prixarticles.idPrixArticle AND client_passant_commande.idClient = clients.idClient AND articles.idArticle = prixarticles.idArticle AND prixarticles.dateDebut <= panier_commandes.dateCommande AND (prixarticles.dateFin >= panier_commandes.dateCommande) AND numCommande IS NULL AND client_passant_commande.idClient = :idClient;");
     $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
     $request->execute();
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function deleteArticleFromCart($idArticle, $idClient, $idCommande)
+function deleteArticleFromCart($idClient, $idCommande)
 {
     $connexion = getConnexion();
-    $requete = $connexion->prepare("DELETE FROM panier_commandes WHERE panier_commandes.idArticle = :idArticle AND panier_commandes.idClient = :idClient AND panier_commandes.idCommande = :idCommande;");
-    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $requete = $connexion->prepare("DELETE FROM panier_commandes WHERE panier_commandes.idClient = :idClient AND panier_commandes.idCommande = :idCommande;");
     $requete->bindParam(':idClient', $idClient, PDO::PARAM_INT);
     $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
     $requete->execute();
-    /*$requete = $connexion->prepare("DELETE FROM articles_concernant_commande WHERE idArticle = :idArticle AND idCommande = :idCommande;");
-    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
-    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
-    $requete->execute();
-    $requete = $connexion->prepare("DELETE FROM client_passant_commande WHERE idClient = :idClient AND idCommande = :idCommande;");
-    $requete->bindParam(':idClient', $idClient, PDO::PARAM_INT);
-    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
-    $requete->execute();*/
 }
+
+function deleteCommandConcernArticle($idArticle, $idCommande)
+{
+    $connexion = getConnexion();
+    $requete = $connexion->prepare("DELETE FROM articles_concernant_commande WHERE articles_concernant_commande.idArticle = :idArticle AND articles_concernant_commande.idCommande = :idCommande ;");
+    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
+    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $requete->execute();
+}
+
+/* Fonction permettant de voir un utilisateur non-validé */
+function getIdArticleFromCart($idClient)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT idCommande FROM panier_commandes WHERE  idClient = :idClient;");
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_STR);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+/* Fonction permettant de voir un utilisateur non-validé */
+function getWallet($idUser)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT * FROM portemonnaie WHERE idUtilisateur = :idUtilisateur;");
+    $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+/* Fonction permettant de modifier les données des utilisteurs */
+function updateWallet($idUtilisateur, $solde)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("UPDATE portemonnaie SET solde = :solde WHERE idUtilisateur = :idUtilisateur;");
+    $request->bindParam(':solde', $solde, PDO::PARAM_STR);
+    $request->bindParam(':idUtilisateur', $idUtilisateur, PDO::PARAM_INT);
+    $request->execute();
+}
+
+function createBills($montant, $idCommande)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `factures` (`montantTotal`, `idCommande`) VALUES (:montant, :idCommande)");
+    $request->bindParam(':montant', $montant, PDO::PARAM_STR);
+    $request->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $request->execute();
+}
+
 ?>

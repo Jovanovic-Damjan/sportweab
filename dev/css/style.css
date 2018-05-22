@@ -4,7 +4,7 @@ body {
 }
 
 nav {
-    width: 35%;
+    width:40%;
     height: auto;
     margin: auto;
     text-align: center;
@@ -186,6 +186,10 @@ textarea {
 .total{
     margin-top: 30px;
 }
+.filter-ico{
+    width: 1.5%;
+    height: 1.5%;
+}
 /******************************************/
 /**************** ID *****************/
 /******************************************/
@@ -219,4 +223,11 @@ textarea {
     margin-top: 100px;
     text-align: center;
     width: 50%;
+}
+
+#filtre{
+    text-align: center;
+    margin: auto;
+    width: 60%;
+    margin-bottom: 10px;
 }

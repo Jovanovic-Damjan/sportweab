@@ -3,17 +3,20 @@ session_start();
 
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
-if(isset($_SESSION['idClient'])) {
+if (isset($_SESSION['idClient'])) {
     $idClient = $_SESSION['idClient'];
 }
 if (isset($_GET['id'])) {
     $idArticle = $_GET['id'];
     $getArticleInfo = getArticleInfo($idArticle);
+
 }
 
 $success = "";
 if (isset($_POST['delete'])) {
+    $image = filter_input(INPUT_POST, 'imageArticle', FILTER_SANITIZE_STRING);
     deleteArticle($_POST['idArticle']);
+    unlink("../img/" . $image);
     header('Location: produits.php');
     die();
 }
@@ -21,10 +24,12 @@ if (isset($_POST['delete'])) {
 if (isset($_POST['ajoutPanier'])) {
     $taille = filter_input(INPUT_POST, 'taille', FILTER_SANITIZE_STRING);
     $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
-    $idCommand = addArticleToCart($taille,$idClient,$idArticle);
-    CommandConcernArticle($idArticle,$idCommand);
-    CommandConcernClient($idClient,$idCommand);
-    header('Location: produits.php');
+    $idPrixArticle = filter_input(INPUT_POST, 'idPrixArticle', FILTER_VALIDATE_INT);
+
+    $idCommand = addArticleToCart($taille, $idClient, $idArticle, $idPrixArticle);
+    CommandConcernArticle($idArticle, $idCommand);
+    CommandConcernClient($idClient, $idCommand);
+    header('Location: panier.php');
     die();
 }
 ?>
@@ -52,8 +57,8 @@ if (isset($_POST['ajoutPanier'])) {
 <article>
     <section>
         <?php
-        if($success !== ""){
-            echo '<div class="alert alert-success message"><strong>'.$success.'</strong></br><a href="produits.php" class="message">Retour à la page des produits</a></div>';
+        if ($success !== "") {
+            echo '<div class="alert alert-success message"><strong>' . $success . '</strong></br><a href="produits.php" class="message">Retour à la page des produits</a></div>';
         }
         /*Boucle permettant d'afficher tout les articles*/
         if (isset($_GET['id'])){
@@ -65,7 +70,7 @@ if (isset($_POST['ajoutPanier'])) {
         <form method="post" action="article.php">
             <div class="row">
                 <div class="col-xs-12 col-md-4">
-                    <label class="text-article">
+                    <div class="text-article">
                         <p>
                             <?= $value['descriptionArticle']; ?>
                         </p>
@@ -84,7 +89,11 @@ if (isset($_POST['ajoutPanier'])) {
                             Prix : <b><?= $value['prix']; ?></b> CHF
                         </p>
                         <p>
-                            Nombre en stock : <b><?php if($value['stock'] !== null && $value['stock'] > 0){echo $value['stock'];}elseif($value['stock'] == 0){echo "Rupture de stock";} ?></b>
+                            Nombre en stock : <b><?php if ($value['stock'] !== null && $value['stock'] > 0) {
+                                    echo $value['stock'];
+                                } elseif ($value['stock'] == 0) {
+                                    echo "Rupture de stock";
+                                } ?></b>
                         </p>
                         <?php
 
@@ -135,11 +144,13 @@ if (isset($_POST['ajoutPanier'])) {
                         ?>
                         <p>
                             <input type="text" hidden name="idArticle" value="<?= $value['idArticle']; ?>">
+                            <input type="text" hidden name="idPrixArticle" value="<?= $value['idPrixArticle']; ?>">
                         </p>
-                    </label>
+                    </div>
                 </div>
                 <div class="col-md-8">
                     <img src="../img/<?= $value['imageArticle']; ?>" class="imageArticle">
+                    <input type="text" hidden name="imageArticle" value="<?= $value['imageArticle']; ?>">
                 </div>
             </div>
         </form>

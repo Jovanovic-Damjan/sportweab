@@ -5428,7 +5428,6 @@ button.close {
 .modal-open .modal {
   overflow-x: hidden;
   overflow-y: auto;
-  z-index: 100000;
 }
 
 .modal-dialog {

@@ -3,17 +3,40 @@ session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 
-if(isset($_SESSION['idClient'])) {
+if (isset($_SESSION['idClient'])) {
     $idClient = $_SESSION['idClient'];
 }
 $panier = getCart($idClient);
+$info = "";
+$totalCart = 0;
+$wallet = getWallet($idClient);
 
 if (isset($_POST['delete'])) {
-    $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
     $idCommande = filter_input(INPUT_POST, 'idCommande', FILTER_VALIDATE_INT);
-    deleteArticleFromCart($idArticle, $idClient, $idCommande);
+    $idArticle = filter_input(INPUT_POST, 'idArticle', FILTER_VALIDATE_INT);
+
+    deleteArticleFromCart($idClient, $idCommande);
+    updateStock($idArticle);
+
     header('Location: panier.php');
     die();
+}
+
+if(isset($_POST['payer'])){
+    $idCommande = filter_input(INPUT_POST, 'idCommande', FILTER_VALIDATE_INT);
+    $solde = $wallet[0]['solde'];
+    if($totalCart <= $solde){
+        $solde = $solde - $totalCart;
+        updateWallet($idClient, $solde);
+        $numCommande = date("Y-m-d").uniqid();
+        checkoutCart($numCommande,$idClient);
+        createBills($totalCart, $idCommande);
+        $info = "Commande payée avec succès !";
+
+    }
+    else{
+        $info = "Solde insuffisant !";
+    }
 }
 ?>
     <!doctype html>
@@ -40,8 +63,16 @@ if (isset($_POST['delete'])) {
         <h1>Panier</h1>
         <section>
             <?php
-            foreach ($panier as $key => $value) {
-                echo '<form action="panier.php" method="post">
+            if($info != ""){
+                echo '<div class="alert alert-success error">'.$info.'</div>';
+            }
+
+            $i = 0;
+            $totalCart = 0;
+            if (count($panier) > 0) {
+                foreach ($panier as $key => $value) {
+
+                    echo '<form action="panier.php" method="post">
             <div class="row panier">
                 <div class="col-xs-12 col-sm-6 col-md-2">
                     <img src="../img/' . $value['imageArticle'] . '" class="img-panier">
@@ -51,28 +82,66 @@ if (isset($_POST['delete'])) {
                 </div>
                 <div class="col-md-2">
                     <p><b>' . $value['prix'] . ' CHF</b></p>
-                    <input type="text" name="idCommande" hidden  value="'.$value['idCommande'].'">
-                    <input type="text" name="idArticle" hidden  value="'.$value['idArticle'].'">
+                    <input type="text" name="idCommande" hidden  value="' . $value['idCommande'] . '">
+                    <input type="text" name="idArticle" hidden  value="' . $value['idArticle'] . '">
                 </div>
                 <div class="col-md-4">
                     <input type="submit" name="delete" class="btn btn-danger" value="Supprimer l\'article" >
                 </div>
+                <div class="col-md-4">
+                    <input type="text" name="idCommande" hidden value="'.$value['idCommande'].'">
+                </div>
             </div>
             </form>';
-            } ?>
+                    $totalCart += $value['prix'];
+                }
+            } else {
+                $info = "Aucun article dans votre panier !";
+            }
 
+            /* Test qui vérifie qu'il existe des erreurs et les affiche */
+            if ($info !== "") {
+                echo '<div class="alert alert-warning message">' . $info . '</div>';
+            }
+            ?>
             <div class="row total">
                 <div class="col-md-4">
-                    <label>1</label>
+                    Nombres d'articles dans le panier : <b><?= count($panier); ?></b></label>
                 </div>
                 <div class="col-md-4">
-                    <label>Total : 40 CHF</label>
+                    <label>Total : <b><?= $totalCart; ?></b> CHF</label>
                 </div>
                 <div class="col-md-4">
-                    <a href="#" class="btn btn-primary">Payer la commande</a>
+                    <!-- Button trigger modal -->
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                        Payer la commande
+                    </button>
+                    <form method="post" action="panier.php">
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Paiement de la commande</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Total de  votre panier : <b><?= $totalCart;?></b> CHF<br>
+                                    Total de votre porte-monnaie : <b><?= $wallet[0]['solde']; ?></b> CHF
+                                    <input type="text" name="idCommande" value="<?= $value['idCommande']?>"
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                    <input type="submit" name="payer" class="btn btn-primary" value="Payer la commande">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </form>
                 </div>
             </div>
-
         </section>
     </article>
     </body>

@@ -5,7 +5,7 @@ require_once "htmlToPhp.php";
 ?>
 <!doctype html>
 <?php
-$articles = getArticles();
+$articles = getImage();
 $numOfCols = 3;
 $rowCount = 0;
 $bootstrapColWidth = 12 / $numOfCols;
@@ -64,7 +64,7 @@ $bootstrapColWidth = 12 / $numOfCols;
             <div class="col-xs-12 col-md-4 container">
                 <img class="img-article" src="../img/t-shirt.jpg">
                 <div class="middle">
-                    <label><a href="produits.php?categorie=tshirt" class="produit-article">T-shirt</a></label>
+                    <label><a href="produits.php?categorie=T-shirt" class="produit-article">T-shirt</a></label>
                 </div>
             </div>
             <div class="col-md-4 container">

@@ -16,13 +16,21 @@ $success = "";
 
 // Fonction qui permet de poster des images
 if (isset($_POST['ajoutProduit'])) {
-    if ((!empty($_POST['nomArticle'])) && ($_FILES['imageArticle']['size'] !== 0) && ($_FILES['imageArticle']['error'] == 0) && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock']))) {
+    if ((!empty($_POST['nomArticle'])) && ($_FILES['imageArticle']['size'] !== 0) && ($_FILES['imageArticle']['error'] == 0) && (!empty($_POST['descriptionArticle'])) && (!empty($_POST['prixArticle'])) && (!empty($_POST['categorie'])) && (!empty($_POST['nbStock'])) && (!empty($_POST['dateFin']))) {
 
         $nomArticle = filter_input(INPUT_POST, 'nomArticle', FILTER_SANITIZE_STRING);
         $descriptionArticle = filter_input(INPUT_POST, 'descriptionArticle', FILTER_SANITIZE_STRING);
         $prixArticle = filter_input(INPUT_POST, 'prixArticle', FILTER_VALIDATE_FLOAT);
         $idCategorie = filter_input(INPUT_POST, 'categorie', FILTER_VALIDATE_INT);
         $nombreStock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
+        $dateFin = filter_input(INPUT_POST, 'dateFin', FILTER_SANITIZE_STRING);
+
+
+        $dateFin = strtotime($dateFin);
+        $dateFin = date('Y-m-d ', $dateFin); //now you can save in DB
+
+
+
 
         $extensions_autorisees = array('image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/JPG');
         if (($nombreStock > 0) && ($nombreStock <= 100)) {
@@ -36,15 +44,15 @@ if (isset($_POST['ajoutProduit'])) {
 
                 // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
                 $imageArticle = $uniqId . "." . $extension;
-
+                $idArticle = 0;
                 if (in_array($_FILES['imageArticle']['type'], $extensions_autorisees)) {
                     // La fonction permet de transférer les fichiers sélectionné dans un répertoire
                     move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
                     if (!is_uploaded_file($_FILES['imageArticle']['tmp_name'])) {
                         // On finit par ajouter les fichiers dans la base de données
-                        $idPrix = addPrice($prixArticle, $dateActuelle);
-                        $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrix);
-                        addPriceHistoric($idPrix, $idArticle);
+                        $idPrixArticle = addPrice($prixArticle, $dateFin, $idArticle);
+                        $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrixArticle);
+                        updatePriceArticle($idArticle,$idPrixArticle);
                         header('Location: ajouterProduits.php');
                         die();
                     }
@@ -123,6 +131,12 @@ if (isset($_POST['ajoutProduit'])) {
                     <input class="form-control oklm" required name="prixArticle" value="<?php if (isset($prixArticle)) {
                         echo $prixArticle;
                     } ?>" type="number" min="1" max="100">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="example-number-input"><b>Date fin du prix</b></label>
+                <div class="col-10">
+                    <input type="date" id="dateFin" min="<?= date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));?>" class="form-control oklm"   name="dateFin">
                 </div>
             </div>
             <div class="form-group">
