@@ -190,6 +190,9 @@ textarea {
     width: 1.5%;
     height: 1.5%;
 }
+.textAlignement{
+    line-height: 50px;
+}
 /******************************************/
 /**************** ID *****************/
 /******************************************/
@@ -229,5 +232,24 @@ textarea {
     text-align: center;
     margin: auto;
     width: 60%;
+    height: 40px;
     margin-bottom: 10px;
+    border-bottom-style: solid;
+    line-height: 30px;
+}
+
+#pagination{
+    margin: auto;
+    text-align: center;
+    width: 10%;
+}
+
+#tableCommande{
+    margin-top: 10px;
+}
+
+#table-historic{
+    width: 60%;
+    margin: auto;
+    text-align: center;
 }

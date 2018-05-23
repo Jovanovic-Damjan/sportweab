@@ -17,7 +17,7 @@ if (isset($_POST['delete'])) {
     $image = filter_input(INPUT_POST, 'imageArticle', FILTER_SANITIZE_STRING);
     deleteArticle($_POST['idArticle']);
     unlink("../img/" . $image);
-    header('Location: produits.php');
+    header('Location: produits.php?page=1');
     die();
 }
 
@@ -29,7 +29,7 @@ if (isset($_POST['ajoutPanier'])) {
     $idCommand = addArticleToCart($taille, $idClient, $idArticle, $idPrixArticle);
     CommandConcernArticle($idArticle, $idCommand);
     CommandConcernClient($idClient, $idCommand);
-    header('Location: panier.php');
+    header('Location: produits.php?page=1');
     die();
 }
 ?>

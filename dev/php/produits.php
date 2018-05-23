@@ -9,30 +9,30 @@ $rowCount = 0;
 $bootstrapColWidth = 12 / $numOfCols;
 
 
-
 if (isset($_GET['categorie'])) {
     $categorie = $_GET['categorie'];
-}
-else{
+} else {
     $categorie = "";
 }
 
-if(isset($_GET['order']))
-{
+if (isset($_GET['order'])) {
     $order = $_GET['order'];
-}
-else {
+} else {
     $order = "";
 }
-if(isset($_GET['way']))
-{
+if (isset($_GET['way'])) {
     $way = $_GET['way'];
-}
-else {
+} else {
     $way = "";
 }
 
-$articles = getArticles($categorie,$order,$way);
+$articles = getArticles($categorie, $order, $way);
+
+$nbrElements = count($articles);
+$nbrElementsPerPage = 12;
+
+$page = $_GET['page'];
+
 
 ?>
 <!doctype html>
@@ -59,47 +59,61 @@ $articles = getArticles($categorie,$order,$way);
     <img src="../img/logo.jpg">
 </header>
 <article>
-    <h1>Nos produits</h1>
+    <h1><?php if (isset($_GET['categorie'])) {
+            echo $_GET['categorie'];
+        } else {
+            echo "Nos produits";
+        }
+        ?>
+    </h1>
     <div id="filtre">
-            Trier par <a href="produits.php?order=prix&way=<?php if($way == "ASC"){echo"DESC";}else{echo"ASC";}; ?><?php if($categorie != ""){echo "&categorie=".$categorie;}?>">Prix <img class="filter-ico" src="../open-iconic-master/svg/chevron-top.svg" alt="icon name"></a> ou par <a href="produits.php?order=nomCategorie&way=<?php if($way == "ASC"){echo"DESC";}else{echo"ASC";}; ?><?php if($categorie != ""){echo "&categorie=".$categorie;}?>">Catégorie</a>
+        Trier par <a href="produits.php?<?php if(isset($_GET['page'])){echo 'page='.$_GET['page'].'&';}?>order=prix&way=<?php if ($way == "ASC") {
+            echo "DESC";
+        } else {
+            echo "ASC";
+        }; ?><?php if ($categorie != "") {
+            echo "&categorie=" . $categorie;
+        } ?>">Prix</a> ou par <a href="produits.php?<?php if(isset($_GET['page'])){echo 'page='.$_GET['page'].'&';}?>order=nomCategorie&way=<?php if ($way == "ASC") {
+            echo "DESC";
+        } else {
+            echo "ASC";
+        }; ?><?php if ($categorie != "") {
+            echo "&categorie=" . $categorie;
+        } ?>">Catégorie</a>
+
     </div>
     <section>
         <div class="row">
             <?php
-            /*Boucle permettant d'afficher tout les articles*/
-            foreach ($articles as $key => $value) { ?>
-                <div class="col-md-4 container"><img class="img-article" src="../img/<?= $value['imageArticle']; ?>">
-                    <div class="middle">
-                        <label><a href="article.php?id=<?= $value['idArticle']; ?>" class="produit-article"><?= $value['nomArticle'].'<br>'.$value['prix'] ?></a></label>
-                    </div>
-                </div>
-                <?php
-                $rowCount++;
-                if ($rowCount % $numOfCols == 0) echo '</div><div class="row">';
+
+            for ($i = $nbrElementsPerPage * ($page - 1); $i < $nbrElementsPerPage * $page; $i++) {
+                if (isset($articles[$i])) {
+                    echo '<div class="col-md-4 container"><img class="img-article" src="../img/' . $articles[$i]['imageArticle'] . '">
+                   <div class="middle">
+                        <label><a href="article.php?id=' . $articles[$i]['idArticle'] . '" class="produit-article">' . $articles[$i]['nomArticle'] . '<br>' . $articles[$i]['prix'] . '</a></label>
+                   </div>
+              </div>';
+                }
+
             }
             ?>
         </div>
-<!--        --><?php
-//        if(isset($_GET['categorie'])){
-//            $categorie = $_GET['categorie'];
-//
-//            $articleByCategorie = getArticleByCategories($categorie);
-//
-//            foreach ($articleByCategorie as $key => $value)
-//            {
-//                echo '<div class="row">';
-//                echo '        <div class="col-md-4 container"><img class="img-article" src="../img/'.$value['imageArticle'].'">
-//                    <div class="middle">
-/*                        <label><a href="article.php?id=<?= $value[\'idArticle\']; ?>" class="produit-article">'.$value['nomArticle'].'<br>'.$value['prix'].'</a></label>*/
-//                    </div>
-//                </div>';
-//                echo '</div>';
-//
-//                $rowCount++;
-//                if ($rowCount % $numOfCols == 0) echo '</div><div class="row">';
-//            }
-//        }
-//        ?>
+        <!-- Pagination -->
+        <div class="row" id="pagination">
+            <?php
+            $pagesTotales = ceil($nbrElements / $nbrElementsPerPage);
+            echo '<nav aria-label="Page navigation example"><ul class="pagination justify-content-center">';
+            for ($j = 1; $j <= $pagesTotales; $j++) {
+                if ($j == $page) {
+                    echo '<li class="page-item disabled"><a class="page-link" href="produits.php?page='.$j.'">'.$j.' '.'</a></li>';
+                } else {
+                    echo '<li class="page-item"><a class="page-link" href="produits.php?page='.$j.'">'.$j.'</a></li>';
+                }
+            }
+            echo '</ul></nav>';
+            ?>
+        </div>
+
     </section>
 </article>
 </body>

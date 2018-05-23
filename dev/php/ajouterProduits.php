@@ -154,7 +154,7 @@ if (isset($_POST['ajoutProduit'])) {
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" name="ajoutProduit" class="btn btn-primary">Ajouter le produit</button>
+                <input type="submit" name="ajoutProduit" class="btn btn-primary" value="Ajouter le produit">
             </div>
             <p>
                 <a href="administration.php">retour à l'administration</a>

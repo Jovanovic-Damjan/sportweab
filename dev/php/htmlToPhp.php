@@ -9,6 +9,7 @@
 
 function menu()
 {
+    $idClient = 0;
     if (isset($_SESSION['idClient'])) {
         $idClient = $_SESSION['idClient'];
     }
@@ -25,13 +26,13 @@ function menu()
                 <a class='nav-link' href='index.php'>Accueil</a>
             </li>
             <li class='nav-item'>
-                <a class='nav-link' href='produits.php'>Produits</a>
+                <a class='nav-link' href='produits.php?page=1'>Produits</a>
             </li>";
     if ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Administrateur")) {
         echo "<li class='nav-item'><a class='nav-link' href='administration.php'>Administration</a></li>";
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Utilisateur")) {
-        echo "<li class='nav-item'>" . $_SESSION["login"] . "</li>";
+        echo "<li class='nav-item'><a class='nav-link' href='user.php'>" . $_SESSION["login"] . "</a></li>";
         echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier<span class=\"badge badge-pill badge-dark\">".count($panier)."</span></a></li>";
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif (!isset($_SESSION["login"])) {

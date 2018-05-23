@@ -54,7 +54,7 @@ if (isset($_POST['modification'])) {
                             }
                                 $idPrix = addPrice($prixArticle, $dateDebut, $dateFin, $idArticle);
                                 updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
-                                header('Location: produits.php');
+                                header('Location: produits.php?page=1');
                                 die();
                             }
                     } else {

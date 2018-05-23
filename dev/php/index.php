@@ -64,19 +64,19 @@ $bootstrapColWidth = 12 / $numOfCols;
             <div class="col-xs-12 col-md-4 container">
                 <img class="img-article" src="../img/t-shirt.jpg">
                 <div class="middle">
-                    <label><a href="produits.php?categorie=T-shirt" class="produit-article">T-shirt</a></label>
+                    <label><a href="produits.php?categorie=T-shirt&page=1" class="produit-article">T-shirt</a></label>
                 </div>
             </div>
             <div class="col-md-4 container">
                 <img class="img-article" src="../img/hoodie.jpg">
                 <div class="middle">
-                    <label><a href="produits.php?categorie=hoodie" class="produit-article">Hoodie</a></label>
+                    <label><a href="produits.php?categorie=Hoodie&page=1" class="produit-article">Hoodie</a></label>
                 </div>
             </div>
             <div class="col-md-4 container">
                 <img class="img-article" src="../img/casquette.jpg">
                 <div class="middle">
-                    <label><a href="produits.php?categorie=casquette" class="produit-article">Casquette</a></label>
+                    <label><a href="produits.php?categorie=Casquette&page=1" class="produit-article">Casquette</a></label>
                 </div>
             </div>
         </div>

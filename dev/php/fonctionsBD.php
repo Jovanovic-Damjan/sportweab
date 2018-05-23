@@ -55,9 +55,9 @@ function getArticles($categorie,$order,$way)
 {
     $query = "SELECT DISTINCT articles.idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie, max(prixarticles.dateDebut), prixarticles.prix FROM articles, categories, prixarticles WHERE articles.idArticle = prixarticles.idArticle AND articles.idCategorie = categories.idCategorie AND articles.idPrixArticle = prixarticles.idPrixArticle ";
     switch ($categorie){
-        case "hoodie" : $query .= " AND nomCategorie = \"hoodie\" GROUP BY articles.idArticle ORDER BY ";
+        case "Hoodie" : $query .= " AND nomCategorie = \"hoodie\" GROUP BY articles.idArticle ORDER BY ";
         break;
-        case "casquette" : $query .= " AND nomCategorie = \"casquette\" GROUP BY articles.idArticle ORDER BY ";
+        case "Casquette" : $query .= " AND nomCategorie = \"casquette\" GROUP BY articles.idArticle ORDER BY ";
             break;
         case "T-shirt" : $query .= " AND nomCategorie = \"T-shirt\" GROUP BY articles.idArticle ORDER BY ";
             break;
@@ -308,7 +308,7 @@ function deleteArticle($idArticle)
 function checkoutCart($numCommande, $idClient)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("UPDATE panier_commandes SET numCommande = :numCommande WHERE idClient = :idClient ;");
+    $request = $connexion->prepare("UPDATE panier_commandes SET numCommande = :numCommande WHERE idClient = :idClient AND numCommande IS NULL;");
     $request->bindParam(':numCommande', $numCommande, PDO::PARAM_STR);
     $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
     $request->execute();
@@ -367,6 +367,15 @@ function getCart($idClient)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+function getSumCart($idClient)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT sum(prixarticles.prix) as 'total' FROM panier_commandes, prixarticles, articles, articles_concernant_commande WHERE panier_commandes.idPrixArticle = prixarticles.idPrixArticle AND panier_commandes.idCommande = articles_concernant_commande.idCommande AND articles_concernant_commande.idArticle = articles.idArticle AND numCommande IS NULL AND panier_commandes.idClient = :idClient;");
+    $request->bindParam(':idClient', $idClient, PDO::PARAM_INT);
+    $request->execute();
+    return $request->fetchAll(PDO::FETCH_ASSOC);
+}
+
 function deleteArticleFromCart($idClient, $idCommande)
 {
     $connexion = getConnexion();
@@ -417,13 +426,50 @@ function updateWallet($idUtilisateur, $solde)
     $request->execute();
 }
 
-function createBills($montant, $idCommande)
+function createBills($montant, $allIdCommand)
+{
+    $values = null;
+    foreach ($allIdCommand as $key => $idCommand)
+    {
+        $values .= '(:montant,'.$idCommand['idCommande'].' ),';
+    }
+    $values = substr($values,0,-1);
+    $connexion = getConnexion();
+    $request = $connexion->prepare("INSERT INTO `factures` (`montantTotal`, `idCommande`) VALUES $values");
+    $request->bindParam(':montant', $montant, PDO::PARAM_STR);
+    $request->execute();
+}
+
+function getIdCommand($idUser)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("INSERT INTO `factures` (`montantTotal`, `idCommande`) VALUES (:montant, :idCommande)");
-    $request->bindParam(':montant', $montant, PDO::PARAM_STR);
-    $request->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
+    $request = $connexion->prepare("SELECT idCommande FROM sportweab.panier_commandes WHERE idClient = :idUtilisateur;");
+    $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
     $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+
+function getAllCommands($idUser)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT DISTINCT * FROM panier_commandes WHERE idClient = :idUtilisateur GROUP BY numCommande;");
+    $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
+}
+
+function getDetailsCommand($idClient,$numCommand)
+{
+    $connexion = getConnexion();
+    $request = $connexion->prepare("SELECT distinct articles.idArticle, articles.nomArticle, imageArticle,panier_commandes.taille, prixarticles.prix FROM panier_commandes, prixarticles, articles, articles_concernant_commande , factures WHERE panier_commandes.idPrixArticle = prixarticles.idPrixArticle AND panier_commandes.idCommande = articles_concernant_commande.idCommande AND articles_concernant_commande.idArticle = articles.idArticle AND panier_commandes.idCommande = factures.idCommande AND panier_commandes.idClient = :idUtilisateur AND panier_commandes.numCommande = :numCommande AND panier_commandes.numCommande IS NOT NULL;");
+    $request->bindParam(':idUtilisateur', $idClient, PDO::PARAM_INT);
+    $request->bindParam(':numCommande', $numCommand, PDO::PARAM_STR);
+    $request->execute();
+    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
+    return $resultat;
 }
 
 ?>
