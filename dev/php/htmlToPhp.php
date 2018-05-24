@@ -1,9 +1,9 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: Damja
- * Date: 03.04.2018
- * Time: 15:16
+ * Développeur: Jovanovic Damjan
+ * Date: 08.05.2018
+ * Page : htmlToPhp.php
+ * Description : Page permettant contenant des fonctions php pour l'affichage dynamique.
  */
 
 
@@ -33,7 +33,7 @@ function menu()
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif ((isset($_SESSION["login"])) && ($_SESSION["typeUtilisateur"] == "Utilisateur")) {
         echo "<li class='nav-item'><a class='nav-link' href='user.php'>" . $_SESSION["login"] . "</a></li>";
-        echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier<span class=\"badge badge-pill badge-dark\">".count($panier)."</span></a></li>";
+        echo "<li class='nav-item'><a class='nav-link' href='panier.php'>Panier<span class=\"badge badge-pill badge-dark\">" . count($panier) . "</span></a></li>";
         echo "<li class='nav-item'><a class='nav-link' href='deconnexion.php'>Logout</a></li>";
     } elseif (!isset($_SESSION["login"])) {
         echo "<li class='nav-item'><a class='nav-link' href='connexion.php'>Login</a></li>";
@@ -43,22 +43,21 @@ function menu()
 </nav>";
 }
 
-function getSelectCategories(){
+function getSelectCategories()
+{
     $categories = getCategories();
-    if(isset($_GET['id'])){
+    if (isset($_GET['id'])) {
         $actualCategorie = getArticleInfo($_GET['id'])[0]['idCategorie'];
         foreach ($categories as $key => $value) {
-            if ($value['idCategorie'] == $actualCategorie){
-                echo '<option selected value='.$value['idCategorie'].'>'. $value['nomCategorie'] . '</option>';
-            }
-            else {
+            if ($value['idCategorie'] == $actualCategorie) {
+                echo '<option selected value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
+            } else {
                 echo '<option value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
             }
         }
-    }
-    else{
+    } else {
         foreach ($categories as $key => $value) {
-                echo '<option value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
+            echo '<option value=' . $value['idCategorie'] . '>' . $value['nomCategorie'] . '</option>';
         }
     }
 }

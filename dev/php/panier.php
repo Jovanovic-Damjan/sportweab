@@ -1,10 +1,19 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 16.05.2018
+ * Page : panier.php
+ * Description : Page permettant d'afficher les articles qu'on a ajouté dans son panier.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 
 if (isset($_SESSION['idClient'])) {
     $idClient = $_SESSION['idClient'];
+} else {
+    header("Location: index.php");
+    die();
 }
 $panier = getCart($idClient);
 $success = "";
@@ -31,14 +40,18 @@ if (isset($_POST['payer'])) {
 
     $solde = $wallet[0]['solde'];
     if ($solde >= $sumCart[0]['total']) {
+        // Calcule du nouveau solde du porte-monnaie
         $newSolde = $solde - $sumCart[0]['total'];
+        // On envoi le nouveau solde du porte-monnaie
         updateWallet($idClient, $newSolde);
         $numCommande = date("Y-m-d") . uniqid();
         checkoutCart($numCommande, $idClient);
         createBills($sumCart[0]['total'], $allIdCommand);
-        $success = "Commande payée avec succès !";
+        echo '<div class="alert alert-success message">Commande payée avec succès !</div>';
         header('Location: panier.php');
         die();
+
+
     } else {
         $error = "Solde insuffisant !";
     }
@@ -59,28 +72,22 @@ if (isset($_POST['payer'])) {
         <script src="../js/bootstrap.min.js"></script>
         <link href="../css/style.css" rel="stylesheet">
     </head>
-<body>
-<?= menu(); ?>
+    <body>
+    <?= menu(); ?>
     <header>
         <img src="../img/logo.jpg">
     </header>
-<article>
-    <h1>Panier</h1>
-    <section>
-<?php
-if ($success != "") {
-    echo '<div class="alert alert-success message">' . $success . '</div>';
-}
-if ($error !== "") {
-    echo '<div class="alert alert-danger message">' . $error . '</div>';
+    <article>
+        <h1>Panier</h1>
+        <section>
+            <?php
 
-}
-$i = 0;
-$totalCart = 0;
-if (count($panier) > 0) {
-    foreach ($panier as $key => $value) {
+            $i = 0;
+            $totalCart = 0;
+            if (count($panier) > 0) {
+                foreach ($panier as $key => $value) {
 
-        echo '<form action="panier.php" method="post">
+                    echo '<form action="panier.php" method="post">
             <div class="row panier">
                 <div class="col-xs-12 col-sm-6 col-md-2">
                 <a href="article.php?id=' . $value['idArticle'] . '">
@@ -103,60 +110,63 @@ if (count($panier) > 0) {
                 </div>
             </div>
             </form>';
-    }
-} else {
-    $info = "Aucun article dans votre panier !";
-}
-
-?>
-    <div class="row total">
-    <div class="col-md-4">
-        Nombres d'articles dans le panier : <b><?= count($panier); ?></b></label>
-    </div>
-    <div class="col-md-4">
-        <label>Total : <b><?= $sumCart[0]['total']; ?></b> CHF</label>
-    </div>
-    <div class="col-md-4">
-<?php
-if (count($panier) > 0) {
-    echo '    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                }
+            } else {
+                echo '<div class="alert alert-warning message">Aucun article dans votre panier !</div>';
+            }
+            ?>
+            <div class="row total">
+                <div class="col-md-4">
+                    Nombres d'articles dans le panier : <b><?= count($panier); ?></b></label>
+                </div>
+                <div class="col-md-4">
+                    <label>Total : <b><?= $sumCart[0]['total']; ?></b> CHF</label>
+                </div>
+                <div class="col-md-4">
+                    <?php
+                    if (count($panier) > 0) {
+                        echo '    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
         Payer la commande
     </button>';
-    }?>
+                    } ?>
 
 
-    <form method="post" action="panier.php">
-        <!-- Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
-             aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Paiement de la commande</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        Total de votre panier : <b><?= $sumCart[0]['total']; ?></b> CHF<br>
-                        Total de votre porte-monnaie : <b><?= $wallet[0]['solde']; ?></b> CHF
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler
-                        </button>
-                        <input type="submit" name="payer" class="btn btn-primary" value="Payer la commande">
-                    </div>
+                    <form method="post" action="panier.php">
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                             aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">Paiement de la commande</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Total de votre panier : <b><?= $sumCart[0]['total']; ?></b> CHF<br>
+                                        Total de votre porte-monnaie : <b><?= $wallet[0]['solde']; ?></b> CHF
+                                    </div>
+                                    <div class="modal-footer">
+                                        <?php
+                                        if ($wallet[0]['solde'] < $sumCart[0]['total']) {
+                                            echo '<div class="alert alert-danger message" role="alert">Solde du porte-monnaie insuffisant !</div>';
+                                        } else {
+                                            echo '<input type="submit" name="payer" class="btn btn-primary" value="Payer la commande">';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </div>
-    </form>
-    </div>
-    </div>
-    </section>
+        </section>
     </article>
     </body>
     </html>
-    <?php
+<?php
 
 
-    ?>
+?>

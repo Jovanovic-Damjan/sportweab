@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 09.05.2018
+ * Page : connexion.php
+ * Description : Page permettant de se connecter a son compte.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
@@ -10,6 +16,8 @@ if (isset($_POST['Submit'])) {
     $pwd = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_STRING);
     if ((!empty($_POST['email'])) && (!empty($_POST['password'])) && (!empty($_POST['captcha']))) {
         if ($_POST['captcha'] == $_SESSION['captcha']) {
+
+            // On hash le mot de passe en sha1
             $motPasse_hash = sha1($pwd);
             $utilisateur = login($email, $motPasse_hash);
 

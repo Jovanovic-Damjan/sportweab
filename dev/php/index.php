@@ -1,14 +1,24 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 08.05.2018
+ * Page : index.php.php
+ * Description : Page permettant d'accueil du site web.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 ?>
 <!doctype html>
 <?php
+
 $articles = getImage();
+
+// Code permettant d'afficher maximum 3 articles/ligne
 $numOfCols = 3;
 $rowCount = 0;
 $bootstrapColWidth = 12 / $numOfCols;
+
 ?>
 <html lang="fr">
 <head>
@@ -43,7 +53,7 @@ $bootstrapColWidth = 12 / $numOfCols;
                     </div>
                     <?php foreach ($articles as $key => $value) { ?>
                         <div class="carousel-item">
-                            <img class="d-block img-fluid" src="../img/<?= $value['imageArticle'];?>">
+                            <img class="d-block img-fluid" src="../img/<?= $value['imageArticle']; ?>">
                         </div>
                     <?php } ?>
                 </div>
@@ -76,7 +86,8 @@ $bootstrapColWidth = 12 / $numOfCols;
             <div class="col-md-4 container">
                 <img class="img-article" src="../img/casquette.jpg">
                 <div class="middle">
-                    <label><a href="produits.php?categorie=Casquette&page=1" class="produit-article">Casquette</a></label>
+                    <label><a href="produits.php?categorie=Casquette&page=1"
+                              class="produit-article">Casquette</a></label>
                 </div>
             </div>
         </div>

@@ -1,9 +1,15 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 11.05.2018
+ * Page : produits.php
+ * Description : Page permettant d'afficher tous les produits.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 
-
+// Code permettant d'afficher 3 articles/ligne
 $numOfCols = 3;
 $rowCount = 0;
 $bootstrapColWidth = 12 / $numOfCols;
@@ -26,13 +32,14 @@ if (isset($_GET['way'])) {
     $way = "";
 }
 
+// Fonction permettant de récupérer les articles
 $articles = getArticles($categorie, $order, $way);
 
+// Variable pour la pagination
 $nbrElements = count($articles);
 $nbrElementsPerPage = 12;
 
 $page = $_GET['page'];
-
 
 ?>
 <!doctype html>
@@ -67,13 +74,17 @@ $page = $_GET['page'];
         ?>
     </h1>
     <div id="filtre">
-        Trier par <a href="produits.php?<?php if(isset($_GET['page'])){echo 'page='.$_GET['page'].'&';}?>order=prix&way=<?php if ($way == "ASC") {
+        Trier par <a href="produits.php?<?php if (isset($_GET['page'])) {
+            echo 'page=' . $_GET['page'] . '&';
+        } ?>order=prix&way=<?php if ($way == "ASC") {
             echo "DESC";
         } else {
             echo "ASC";
         }; ?><?php if ($categorie != "") {
             echo "&categorie=" . $categorie;
-        } ?>">Prix</a> ou par <a href="produits.php?<?php if(isset($_GET['page'])){echo 'page='.$_GET['page'].'&';}?>order=nomCategorie&way=<?php if ($way == "ASC") {
+        } ?>">Prix</a> ou par <a href="produits.php?<?php if (isset($_GET['page'])) {
+            echo 'page=' . $_GET['page'] . '&';
+        } ?>order=nomCategorie&way=<?php if ($way == "ASC") {
             echo "DESC";
         } else {
             echo "ASC";
@@ -105,9 +116,9 @@ $page = $_GET['page'];
             echo '<nav aria-label="Page navigation example"><ul class="pagination justify-content-center">';
             for ($j = 1; $j <= $pagesTotales; $j++) {
                 if ($j == $page) {
-                    echo '<li class="page-item disabled"><a class="page-link" href="produits.php?page='.$j.'">'.$j.' '.'</a></li>';
+                    echo '<li class="page-item disabled"><a class="page-link" href="produits.php?page=' . $j . '">' . $j . ' ' . '</a></li>';
                 } else {
-                    echo '<li class="page-item"><a class="page-link" href="produits.php?page='.$j.'">'.$j.'</a></li>';
+                    echo '<li class="page-item"><a class="page-link" href="produits.php?page=' . $j . '">' . $j . '</a></li>';
                 }
             }
             echo '</ul></nav>';

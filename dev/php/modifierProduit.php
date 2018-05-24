@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 11.05.2018
+ * Page : modifierProduit.php
+ * Description : Page permettant de modifier les informations d'un produit.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
@@ -16,6 +22,7 @@ if (isset($_SESSION['typeUtilisateur']) && ($_SESSION['typeUtilisateur'] !== "Ad
 $categories = getCategories();
 
 $array_error = array();
+
 $success = "";
 
 // Fonction qui permet de poster des images
@@ -49,25 +56,25 @@ if (isset($_POST['modification'])) {
                         move_uploaded_file($_FILES['uploadImageArticle']['tmp_name'], "../img/$imageArticle");
                         if (!is_uploaded_file($_FILES['uploadImageArticle']['tmp_name'])) {
                             // On finit par ajouter les fichiers dans la base de données
-                            if($dateFin == "") {
+                            if ($dateFin == "") {
                                 $dateFin = null;
                             }
-                                $idPrix = addPrice($prixArticle, $dateDebut, $dateFin, $idArticle);
-                                updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
-                                header('Location: produits.php?page=1');
-                                die();
-                            }
+                            $idPrix = addPrice($prixArticle, $dateDebut, $dateFin, $idArticle);
+                            updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
+                            header('Location: produits.php?page=1');
+                            die();
+                        }
                     } else {
                         array_push($array_error, "Veuillez sélectionner que des images !");
                     }
                 } else {
-                    if($dateFin == "") {
+                    if ($dateFin == "") {
                         $dateFin = null;
                     }
-                    updatePrice($idArticle,$prixArticle);
+                    updatePrice($idArticle, $prixArticle);
                     $idPrix = addPrice($prixArticle, $dateFin, $idArticle);
                     updateArticle($nomArticle, $imageActuelle, $descriptionArticle, $stock, $idCategorie, $idPrix, $idArticle);
-                    header('Location: produits.php');
+                    header('Location: produits.php?page=1');
                     die();
                 }
             } else {
@@ -144,7 +151,9 @@ if (isset($_POST['modification'])) {
                     <div class="form-group">
                         <label for="example-number-input"><b>Date fin du prix</b></label>
                         <div class="col-10">
-                            <input type="date" id="dateFin" min="<?= date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));?>" class="form-control oklm"  value="<?= $value['prix']; ?>" name="dateFin">
+                            <input type="date" id="dateFin"
+                                   min="<?= date('Y-m-d', strtotime(date("Y-m-d") . ' + 1 days')); ?>"
+                                   class="form-control oklm" value="<?= $value['prix']; ?>" name="dateFin">
                         </div>
                     </div>
                     <div class="form-group">
@@ -181,9 +190,9 @@ if (isset($_POST['modification'])) {
 </body>
 </html>
 <script>
-    $("#dateDebut").change(function() {
+    $("#dateDebut").change(function () {
         $("#dateFin").attr({
-            "min" : $("#dateDebut").val()
+            "min": $("#dateDebut").val()
         });
     });
 </script>

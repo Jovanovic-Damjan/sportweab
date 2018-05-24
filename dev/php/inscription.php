@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 09.05.2018
+ * Page : inscription.php
+ * Description : Page permettant l'inscription de nouveau utilisateurs.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
@@ -30,21 +36,26 @@ if (isset($_POST['register'])) {
         }
 
         if ($_POST['captcha'] == $_SESSION['captcha']) {
+
             if ($password == $confirmPassword) {
-                $password = sha1($password);
-                if($email == true){
-                if (user_exists($email) == false) {
-                    if ($array_error == null) {
-                        $idUser = registerUser($email, $password);
-                        registerClient($nom, $prenom, $adresse, $codePostal, $ville, $pays, $telephone, $email, $password, $idUser);
-                        createWallet($idUser);
-                        $success = "Enregistrement avec succès !";
+                if (minPwd($password)) {
+                    $password = sha1($password);
+                    if ($email == true) {
+                        if (user_exists($email) == false) {
+                            if ($array_error == null) {
+                                $idUser = registerUser($email, $password);
+                                registerClient($nom, $prenom, $adresse, $codePostal, $ville, $pays, $telephone, $email, $password, $idUser);
+                                createWallet($idUser);
+                                $success = "Enregistrement avec succès !";
+                            }
+                        } else {
+                            array_push($array_error, "Un compte existe déjà avec l'email :" . $email);
+                        }
+                    } else {
+                        array_push($array_error, "Veuillez entrer un email valide !");
                     }
-                }else {
-                    array_push($array_error, "Un compte existe déjà avec l'email :" . $email);
-                }
-                } else{
-                    array_push($array_error, "Veuillez entrer un email valide !");
+                } else {
+                    array_push($array_error, "Minimum 4 caractères pour le mot de passe !");
                 }
             } else {
                 array_push($array_error, "Les mots de passe ne correspondent pas.");
@@ -55,12 +66,14 @@ if (isset($_POST['register'])) {
     } else {
         array_push($array_error, "Veuillez remplir tous les champs.");
     }
+
 }
+
 
 /* On test si l'utilisateur est déjà connecté on le redirige sur la page index */
 if (isset($_SESSION["connecté"]) && $_SESSION['connecte'] == true) {
-header("location: index.php");
-exit();
+    header("location: index.php");
+    exit();
 }
 
 ?>
@@ -107,16 +120,33 @@ exit();
         ?>
         <form method="post" action="inscription.php">
             <h4>Vos données personnelles</h4>
-            <input type="text" name="nom" required class="form-control" placeholder="Nom" value="<?php if (isset($nom)) {echo $nom;} ?>">
-            <input type="text" name="prenom" required class="form-control" placeholder="Prénom" value="<?php if (isset($prenom)) {echo $prenom;} ?>">
-            <input type="email" name="email" required class="form-control" placeholder="Adresse mail" value="<?php if (isset($email)) {echo $email;} ?>">
+            <input type="text" name="nom" required class="form-control" placeholder="Nom"
+                   value="<?php if (isset($nom)) {
+                       echo $nom;
+                   } ?>">
+            <input type="text" name="prenom" required class="form-control" placeholder="Prénom"
+                   value="<?php if (isset($prenom)) {
+                       echo $prenom;
+                   } ?>">
+            <input type="email" name="email" required class="form-control" placeholder="Adresse mail"
+                   value="<?php if (isset($email)) {
+                       echo $email;
+                   } ?>">
             <input type="password" name="password" required class="form-control" placeholder="Votre mot de passe">
             <input type="password" name="confirmPassword" required class="form-control"
                    placeholder="Confirmer le mot de passe">
             <h4>Informations de livraisons</h4>
-            <input type="text" name="adresse" required class="form-control" placeholder="Adresse" value="<?php if (isset($adresse)) {echo $adresse;} ?>">
-            <input type="text" name="ville" required class="form-control" placeholder="Ville" value="<?php if (isset($ville)) {echo $ville;} ?>">
-            <select name="pays" class="form-control" value="<?php if (isset($pays)) {echo $pays;} ?>">
+            <input type="text" name="adresse" required class="form-control" placeholder="Adresse"
+                   value="<?php if (isset($adresse)) {
+                       echo $adresse;
+                   } ?>">
+            <input type="text" name="ville" required class="form-control" placeholder="Ville"
+                   value="<?php if (isset($ville)) {
+                       echo $ville;
+                   } ?>">
+            <select name="pays" class="form-control" value="<?php if (isset($pays)) {
+                echo $pays;
+            } ?>">
                 <option value="">Pays...</option>
                 <option value="Afganistan">Afghanistan</option>
                 <option value="Albania">Albania</option>
@@ -366,14 +396,19 @@ exit();
                 <option value="Zambia">Zambia</option>
                 <option value="Zimbabwe">Zimbabwe</option>
             </select>
-            <input type="text" name="codePostal" required class="form-control" placeholder="Code postal" value="<?php if (isset($codePostal)) {echo $codePostal;} ?>">
-            <input type="text" name="telephone" required class="form-control" placeholder="Numéro de téléphone" value="<?php if (isset($telephone)) {echo $telephone;} ?>">
+            <input type="text" name="codePostal" required class="form-control" placeholder="Code postal"
+                   value="<?php if (isset($codePostal)) {
+                       echo $codePostal;
+                   } ?>">
+            <input type="text" name="telephone" required class="form-control" placeholder="Numéro de téléphone"
+                   value="<?php if (isset($telephone)) {
+                       echo $telephone;
+                   } ?>">
             <label for="captcha" onselectstart="return false">Recopiez le mot : "<?php echo captcha(); ?>"</label>
             <input type="text" name="captcha" placeholder="captcha" required class="form-control" id="captcha"/><br/>
             <input type="submit" name="register" class="btn btn-lg btn-primary btn-block">
             <a href="connexion.php">Retour au login</a>
         </form>
-
     </section>
 </article>
 </body>

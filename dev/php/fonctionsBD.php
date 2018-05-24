@@ -20,17 +20,7 @@ function getConnexion()
     return $dbb;
 }
 
-/* Fonction permettant d'afficher les rôles des utilisateurs */
-function getRoles()
-{
-    $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT * FROM utilisateur;");
-    $request->execute();
-    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-    return $resultat;
-}
-
-/* Fonction permettant d'afficher les rôles des utilisateurs */
+/* Fonction permettant de sélectionner les catégories */
 function getCategories()
 {
     $connexion = getConnexion();
@@ -40,7 +30,7 @@ function getCategories()
     return $resultat;
 }
 
-/* Fonction permettant d'afficher les rôles des utilisateurs */
+/* Fonction permettant de sélectionner les images des articles */
 function getImage()
 {
     $connexion = getConnexion();
@@ -50,7 +40,7 @@ function getImage()
     return $resultat;
 }
 
-/* Fonction permettant d'afficher des articles*/
+/* Fonction permettant de sélectionner les artices en fonctions des paramètres passés */
 function getArticles($categorie,$order,$way)
 {
     $query = "SELECT DISTINCT articles.idArticle, nomArticle, imageArticle, descriptionArticle,stock,nomCategorie, max(prixarticles.dateDebut), prixarticles.prix FROM articles, categories, prixarticles WHERE articles.idArticle = prixarticles.idArticle AND articles.idCategorie = categories.idCategorie AND articles.idPrixArticle = prixarticles.idPrixArticle ";
@@ -84,7 +74,7 @@ function getArticles($categorie,$order,$way)
     return $resultat;
 }
 
-/* Fonction permettant de voir un utilisateur non-validé */
+/* Fonction permettant d'afficher les articles par catégories */
 function getArticleByCategories($categorie)
 {
     $connexion = getConnexion();
@@ -105,7 +95,7 @@ function getArticleInfo($id)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/* Fonction permettant de se connecter  */
+/* Fonction permettant de se connecter */
 function login($login, $pwd)
 {
     $connexion = getConnexion();
@@ -116,7 +106,7 @@ function login($login, $pwd)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
-/* Fonction permettant de créer un client */
+/* Fonction permettant de créer un client
 function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $mail, $motPasse)
 {
     $connexion = getConnexion();
@@ -131,7 +121,7 @@ function createUser($nom, $prenom, $adresse, $codePostal, $ville, $telephone, $m
     $request->bindParam(':motPasse', $motPasse, PDO::PARAM_STR);
     $request->execute();
     return $connexion->lastInsertId();
-}
+}*/
 
 /* Fonction permettant de vérifier s'il y a déjà un utilisateur enregsitré dans la base de données avec le même e-mail*/
 function user_exists($mail)
@@ -174,7 +164,7 @@ function registerClient($nom, $prenom, $adresse, $codePostal, $ville, $pays, $te
     $request->execute();
 }
 
-/* Fonction permettant de s'enregistrer  */
+/* Fonction permettant de créer un porte-monnaie pour un utilisateur */
 function createWallet($idUser)
 {
     $connexion = getConnexion();
@@ -183,21 +173,11 @@ function createWallet($idUser)
     $request->execute();
 }
 
-/* Fonction permettant de recevoir les informations de l'utilisateur */
+/* Fonction permettant de recevoir les informations d'un utilisateur */
 function getUserInformation($email)
 {
     $connexion = getConnexion();
     $request = $connexion->prepare("SELECT * FROM clients, utilisateurs WHERE clients.mail = :mail AND utilisateurs.mailUtilisateur = :mail");
-    $request->bindParam(':mail', $email, PDO::PARAM_STR);
-    $request->execute();
-    return $request->fetchAll(PDO::FETCH_ASSOC);
-}
-
-/* Fonction permettant de voir le rôle de l'utilisateur */
-function getUserRole($email)
-{
-    $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT * FROM  utilisateurs WHERE mailUtilisateur = :mail;");
     $request->bindParam(':mail', $email, PDO::PARAM_STR);
     $request->execute();
     return $request->fetchAll(PDO::FETCH_ASSOC);
@@ -213,17 +193,6 @@ function getNotValidateUsers()
     return $resultat;
 }
 
-/* Fonction permettant de voir un utilisateur non-validé */
-function getNotValidateUser($email)
-{
-    $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT * FROM utilisateurs WHERE  mailUtilisateur = :mail;");
-    $request->bindParam(':mail', $email, PDO::PARAM_STR);
-    $request->execute();
-    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-    return $resultat;
-}
-
 /* Fonction permetant de valider un utilisateur */
 function validateUser($idUser)
 {
@@ -233,7 +202,7 @@ function validateUser($idUser)
     $request->execute();
 }
 
-/* Fonction permettant d'ajouter un prix  */
+/* Fonction permettant d'ajouter un nouveau prix  */
 function addPrice($prixArticle, $dateFin, $idArticle)
 {
     $connexion = getConnexion();
@@ -245,7 +214,7 @@ function addPrice($prixArticle, $dateFin, $idArticle)
     return $connexion->lastInsertId();
 }
 
-/* Fonction permetant de valider un utilisateur */
+/* Fonction permetant de modifier un prix */
 function updatePrice($idArticle, $idPrixArticle)
 {
     $connexion = getConnexion();
@@ -255,7 +224,7 @@ function updatePrice($idArticle, $idPrixArticle)
     $request->execute();
 }
 
-/* Fonction permetant de valider un utilisateur */
+/* Fonction permetant d'ajouter l'idArticle à un prix */
 function updatePriceArticle($idArticle, $idPrixArticle)
 {
     $connexion = getConnexion();
@@ -265,7 +234,7 @@ function updatePriceArticle($idArticle, $idPrixArticle)
     $request->execute();
 }
 
-/* Fonction permettant de créer un utilisateur  */
+/* Fonction permettant d'ajouter un nouvel article */
 function addArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrixArticle)
 {
     $connexion = getConnexion();
@@ -280,7 +249,7 @@ function addArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $id
     return $connexion->lastInsertId();
 }
 
-/* Fonction permettant de modifier les données des utilisteurs */
+/* Fonction permettant de modifier les données d'un article */
 function updateArticle($nomArticle, $imageArticle, $descriptionArticle, $stock, $idCategorie, $idPrixArticle, $idArticle)
 {
     $connexion = getConnexion();
@@ -304,7 +273,7 @@ function deleteArticle($idArticle)
     $requete->execute();
 }
 
-/* Fonction permettant de modifier les données des utilisteurs */
+/* Fonction permettant de commander un panier */
 function checkoutCart($numCommande, $idClient)
 {
     $connexion = getConnexion();
@@ -329,7 +298,7 @@ function addArticleToCart($taille, $idClient, $idArticle, $idPrixArticle)
     return $connexion->lastInsertId();
 }
 
-/* Fonction permettant d'ajouter un article dans son panier */
+/* Fonction permettant de modifier le stock d'un article */
 function updateStock($idArticle)
 {
     $connexion = getConnexion();
@@ -338,7 +307,7 @@ function updateStock($idArticle)
     $request->execute();
 }
 
-/* Fonction permettant d'ajouter un prix  */
+/* Fonction permettant de sélectionner les articles concernant une commande */
 function CommandConcernArticle($idArticle, $idCommande)
 {
     $connexion = getConnexion();
@@ -348,7 +317,7 @@ function CommandConcernArticle($idArticle, $idCommande)
     $request->execute();
 }
 
-/* Fonction permettant d'ajouter un prix  */
+/* Fonction permettant d'insérer les clients en lien avec la commande  */
 function CommandConcernClient($idClient, $idCommande)
 {
     $connexion = getConnexion();
@@ -358,6 +327,7 @@ function CommandConcernClient($idClient, $idCommande)
     $request->execute();
 }
 
+/* Fonction permettant de récuperer un panier en fonction de l'utilisateur */
 function getCart($idClient)
 {
     $connexion = getConnexion();
@@ -367,6 +337,7 @@ function getCart($idClient)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/* Fonction permettant de calculer la somme d'un panier */
 function getSumCart($idClient)
 {
     $connexion = getConnexion();
@@ -376,6 +347,7 @@ function getSumCart($idClient)
     return $request->fetchAll(PDO::FETCH_ASSOC);
 }
 
+/* Fonction permettant de supprimer un article du panier */
 function deleteArticleFromCart($idClient, $idCommande)
 {
     $connexion = getConnexion();
@@ -385,27 +357,7 @@ function deleteArticleFromCart($idClient, $idCommande)
     $requete->execute();
 }
 
-function deleteCommandConcernArticle($idArticle, $idCommande)
-{
-    $connexion = getConnexion();
-    $requete = $connexion->prepare("DELETE FROM articles_concernant_commande WHERE articles_concernant_commande.idArticle = :idArticle AND articles_concernant_commande.idCommande = :idCommande ;");
-    $requete->bindParam(':idArticle', $idArticle, PDO::PARAM_INT);
-    $requete->bindParam(':idCommande', $idCommande, PDO::PARAM_INT);
-    $requete->execute();
-}
-
-/* Fonction permettant de voir un utilisateur non-validé */
-function getIdArticleFromCart($idClient)
-{
-    $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT idCommande FROM panier_commandes WHERE  idClient = :idClient;");
-    $request->bindParam(':idClient', $idClient, PDO::PARAM_STR);
-    $request->execute();
-    $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
-    return $resultat;
-}
-
-/* Fonction permettant de voir un utilisateur non-validé */
+/* Fonction permettant de récupérer le porte-monnaie d'un utilisateur */
 function getWallet($idUser)
 {
     $connexion = getConnexion();
@@ -416,7 +368,7 @@ function getWallet($idUser)
     return $resultat;
 }
 
-/* Fonction permettant de modifier les données des utilisteurs */
+/* Fonction permettant de modifier le solde du porte-monnaie en fonction de l'utilisateur */
 function updateWallet($idUtilisateur, $solde)
 {
     $connexion = getConnexion();
@@ -426,6 +378,7 @@ function updateWallet($idUtilisateur, $solde)
     $request->execute();
 }
 
+/* Fonction permettant de créer une facture pour une commande */
 function createBills($montant, $allIdCommand)
 {
     $values = null;
@@ -440,6 +393,7 @@ function createBills($montant, $allIdCommand)
     $request->execute();
 }
 
+/* Fonction permettant de récupérer les identifiants en fonction du client*/
 function getIdCommand($idUser)
 {
     $connexion = getConnexion();
@@ -450,17 +404,18 @@ function getIdCommand($idUser)
     return $resultat;
 }
 
-
+/* Fonction permettant de récupérer toutes les commandes d'un client*/
 function getAllCommands($idUser)
 {
     $connexion = getConnexion();
-    $request = $connexion->prepare("SELECT DISTINCT * FROM panier_commandes WHERE idClient = :idUtilisateur GROUP BY numCommande;");
+    $request = $connexion->prepare("SELECT DISTINCT * FROM panier_commandes WHERE idClient = :idUtilisateur AND numCommande IS NOT NULL GROUP BY numCommande;");
     $request->bindParam(':idUtilisateur', $idUser, PDO::PARAM_INT);
     $request->execute();
     $resultat = $request->fetchAll(PDO::FETCH_ASSOC);
     return $resultat;
 }
 
+/* Fonction permettant de récupérer les informations d'une commande */
 function getDetailsCommand($idClient,$numCommand)
 {
     $connexion = getConnexion();

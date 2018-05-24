@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 09.05.2018
+ * Page : validerUtilisateurs.php
+ * Description : Page permettant de valider les comptes des utilisateurs.
+ */
 session_start();
 
 require_once "fonctionsBD.php";
@@ -11,8 +17,7 @@ if (isset($_POST['valider'])) {
     $success = "Utilisateur validé avec succès !";
 }
 
-if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
-{
+if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur") {
     header("location: index.php");
     exit();
 }
@@ -60,7 +65,7 @@ $usersToValidate = getNotValidateUsers();
             echo '<div class="alert alert-success message" role="alert">';
             echo $success;
             echo '</div>';
-        }?>
+        } ?>
     </section>
 </article>
 </body>

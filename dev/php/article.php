@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 11.05.2018
+ * Page : article.php
+ * Description : Page permettant d'afficher les informations d'un article.
+ */
 session_start();
 
 require_once "fonctionsBD.php";

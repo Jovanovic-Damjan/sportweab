@@ -1,11 +1,16 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 09.05.2018
+ * Page : administration.php
+ * Description : Page d'administration contenant les deux liens de l'administration
+ */
 session_start();
 
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
 
-if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur")
-{
+if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Administrateur") {
     header("Location: index.php");
     die();
 }
@@ -18,7 +23,9 @@ if(isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Admi
     <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet">
     <link rel="stylesheet" href="../css/bootstrap.css">
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
     <script src="../js/bootstrap.js"></script>
     <script src="../js/bootstrap.min.js"></script>
     <link href="../css/style.css" rel="stylesheet">

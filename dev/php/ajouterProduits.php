@@ -1,4 +1,10 @@
 <?php
+/**
+ * Développeur: Jovanovic Damjan
+ * Date: 11.05.2018
+ * Page : ajouterProduits.php
+ * Description : Page permettant d'ajouter des nouveaux produits.
+ */
 session_start();
 require_once "fonctionsBD.php";
 require_once "htmlToPhp.php";
@@ -8,7 +14,6 @@ if (isset($_SESSION['typeUtilisateur']) && $_SESSION['typeUtilisateur'] !== "Adm
 }
 
 $categories = getCategories();
-$dateActuelle = date("Y-m-d");
 
 $array_error = array();
 $success = "";
@@ -25,19 +30,20 @@ if (isset($_POST['ajoutProduit'])) {
         $nombreStock = filter_input(INPUT_POST, 'nbStock', FILTER_VALIDATE_INT);
         $dateFin = filter_input(INPUT_POST, 'dateFin', FILTER_SANITIZE_STRING);
 
-
+        // fonction php permettant de convertir la date dans le bon format pour pouvoir ensuite l'ajouter à la BDD
         $dateFin = strtotime($dateFin);
-        $dateFin = date('Y-m-d ', $dateFin); //now you can save in DB
+        $dateFin = date('Y-m-d ', $dateFin);
 
 
-
-
+        //
         $extensions_autorisees = array('image/png', 'image/jpg', 'image/jpeg', 'image/gif', 'image/JPG');
         if (($nombreStock > 0) && ($nombreStock <= 100)) {
             if (($prixArticle > 0) && ($prixArticle <= 150)) {
+
                 // Variable qui contient un identifiant unique qui sera par la suite ajouté au nom de fichier pour que le nom de fichier soit unique
                 $uniqId = uniqid();
 
+                //
                 $count = explode('.', $_FILES['imageArticle']['name']);
                 $count2 = strlen($count[1]);
                 $extension = substr($_FILES['imageArticle']['name'], -$count2);
@@ -45,6 +51,7 @@ if (isset($_POST['ajoutProduit'])) {
                 // On ajoute l'identifiant unique au nom de l'image qu'on stocke dans une variable
                 $imageArticle = $uniqId . "." . $extension;
                 $idArticle = 0;
+
                 if (in_array($_FILES['imageArticle']['type'], $extensions_autorisees)) {
                     // La fonction permet de transférer les fichiers sélectionné dans un répertoire
                     move_uploaded_file($_FILES['imageArticle']['tmp_name'], "../img/$imageArticle");
@@ -52,7 +59,7 @@ if (isset($_POST['ajoutProduit'])) {
                         // On finit par ajouter les fichiers dans la base de données
                         $idPrixArticle = addPrice($prixArticle, $dateFin, $idArticle);
                         $idArticle = addArticle($nomArticle, $imageArticle, $descriptionArticle, $nombreStock, $idCategorie, $idPrixArticle);
-                        updatePriceArticle($idArticle,$idPrixArticle);
+                        updatePriceArticle($idArticle, $idPrixArticle);
                         header('Location: ajouterProduits.php');
                         die();
                     }
@@ -136,7 +143,8 @@ if (isset($_POST['ajoutProduit'])) {
             <div class="form-group">
                 <label for="example-number-input"><b>Date fin du prix</b></label>
                 <div class="col-10">
-                    <input type="date" id="dateFin" min="<?= date('Y-m-d', strtotime(date("Y-m-d"). ' + 1 days'));?>" class="form-control oklm"   name="dateFin">
+                    <input type="date" id="dateFin" min="<?= date('Y-m-d', strtotime(date("Y-m-d") . ' + 1 days')); ?>"
+                           class="form-control oklm" name="dateFin">
                 </div>
             </div>
             <div class="form-group">
